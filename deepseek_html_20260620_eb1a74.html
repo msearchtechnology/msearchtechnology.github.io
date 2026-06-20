@@ -883,7 +883,7 @@
 
             <!-- CATEGORY FILTER BAR -->
             <div class="cat-filter-bar" id="catFilterBar">
-                <span style="font-size:16px" id="catFilterIco">📁</span>
+                <span style="font-size:16px" id="catFilterIco"></span>
                 <span class="cat-filter-name" id="catFilterName">All</span>
                 <button class="cat-clear-btn" onclick="clearCategoryFilter()">✕ Clear</button>
             </div>
@@ -897,7 +897,7 @@
             <!-- CATEGORY RESULTS PANEL -->
             <div class="cat-results-panel" id="catResultsPanel">
                 <div class="cat-results-header">
-                    <span id="catResIco">📁</span>
+                    <span id="catResIco"></span>
                     <span id="catResTitle">Category</span>
                     <span class="cat-res-count" id="catResCount">0 articles</span>
                 </div>
@@ -917,14 +917,14 @@
                 <div class="carousel-dots" id="carouselDots"></div>
                 <div id="photoUploadTrigger" class="photo-upload-trigger" onclick="document.getElementById('galleryFileInput').click()">Add Photo</div>
                 <div class="card-img-caption" id="cardCaptionHolder" contenteditable="false" onblur="updateTextData('caption',this)">Caption</div>
-                <div class="photo-dl-hint" id="photoDlHint">📥 Long press photo to save</div>
+                <div class="photo-dl-hint" id="photoDlHint"> Long press photo to save</div>
             </div>
             <input type="file" id="galleryFileInput" accept="image/*" multiple style="position:fixed;top:-9999px;left:-9999px;" onchange="processLocalImage(event)">
             <input type="file" id="videoFileInput" accept="video/*" multiple style="position:fixed;top:-9999px;left:-9999px;" onchange="processLocalVideo(event)">
 
             <!-- Article category badge -->
             <div id="articleCatBadgeRow" style="padding:6px 16px 2px; display:none;">
-                <span class="article-cat-badge" id="articleCatBadge">📁 —</span>
+                <span class="article-cat-badge" id="articleCatBadge"> —</span>
             </div>
 
             <!-- Category selector (edit mode) -->
@@ -932,7 +932,7 @@
                 <span class="cat-select-label">Category:</span>
                 <select class="cat-select" id="catSelectEl" onchange="setCategoryFromSelect(this.value)">
                     <option value="">— None —</option>
-                    <option value="Education">🎓 Education</option>
+                    <option value="Education"> Education</option>
                     <option value="Sports">⚽ Sports</option>
                     <option value="Technology">💻 Technology</option>
                     <option value="Science">🔬 Science</option>
@@ -1001,7 +1001,7 @@
                     <label>Category</label>
                     <select id="modalCatSelect" style="width:100%;border:1px solid #a2a9b1;border-radius:2px;padding:9px 10px;font-size:14px;color:#000;background:#fff;outline:none;">
                         <option value="">— None —</option>
-                        <option value="Education">🎓 Education</option>
+                        <option value="Education"> Education</option>
                         <option value="Sports">⚽ Sports</option>
                         <option value="Technology">💻 Technology</option>
                         <option value="Science">🔬 Science</option>
@@ -1744,7 +1744,7 @@
         function processLocalImage(event) {
             const files = Array.from(event.target.files);
             if (!files.length) return;
-            if (!selectedItem) { alert("Pehle koi article open karo."); return; }
+            if (!selectedItem) { alert("."); return; }
             if (!selectedItem.images) selectedItem.images = [];
             let loaded = 0;
             files.forEach(file => {
@@ -1840,72 +1840,7 @@
         // CATEGORY SYSTEM
         // ====================================================
         const CAT_ICONS = {
-            'Education': '🎓',
-            'Sports': '⚽',
-            'Technology': '💻',
-            'Science': '🔬',
-            'History': '📜',
-            'Geography': '🌍',
-            'Arts': '🎨',
-            'Music': '🎵',
-            'Business': '💼',
-            'Politics': '🏛️',
-            'Health': '🏥',
-            'Food': '🍽️',
-            'Travel': '✈️',
-            'Entertainment': '🎬',
-            'Finance': '💰',
-            'Nature': '🌿',
-            'Religion': '🕌',
-            'Language': '📖',
-            'Military': '⚔️',
-            'Law': '⚖️',
-            'Organization': '🏢',
-            'Software / App': '📱',
-            'Corporation': '🏗️',
-            'Country': '🌐',
-            'Person': '👤',
-            'Q&A': '❓',
-            'Other': '📌',
-            'Mobile App': '📱',
-            'Educational Org': '🎓',
-            'Bank': '🏦',
-            'News Organization': '📰',
-            'Mobile Technology System': '📱',
-            'App System': '⚙️',
-            'Data System': '💾',
-            'Vote System': '🗳️',
-            'International Group': '🤝',
-            'Question & Answer': '❓',
-            'News Company': '📰',
-            'Banking': '🏦',
-            'Banking Company': '🏦',
-            'Airlines': '✈️',
-            'Oil': '🛢️',
-            'Power': '⚡',
-            'Medicine': '💊',
-            'Car': '🚗',
-            'Car Company': '🚗',
-            'Bike Company': '🏍️',
-            'Channel': '📺',
-            'Channel Company': '📺',
-            'Cement': '🧱',
-            'Shopping Company': '🛍️',
-            'Soda Company': '🥤',
-            'Comic': '📚',
-            'Racing Company': '🏎️',
-            'Memory Company': '💾',
-            'Mobile': '📱',
-            'Dress': '👗',
-            'Team': '👥',
-            'Internal': '🏠',
-            'Advertising': '📣',
-            'Group': '🏗️',
-            'Post Company': '📮',
-            'Toothpaste': '🪥',
-            'Unknown': '❓',
-            'Mobile Parts': '⚙️',
-            'Oil and Gas': '🛢️'
+            'Education': ''
         };
 
         let activeCategoryFilter = null;
@@ -1931,7 +1866,7 @@
             grid.innerHTML = '';
 
             sorted.forEach(([cat, count]) => {
-                const ico = CAT_ICONS[cat] || '📁';
+                const ico = CAT_ICONS[cat] || '';
                 const chip = document.createElement('div');
                 chip.className = 'category-chip' + (activeCategoryFilter === cat ? ' active' : '');
                 chip.innerHTML =
@@ -1943,7 +1878,7 @@
 
         function selectCategory(cat) {
             activeCategoryFilter = cat;
-            const ico = CAT_ICONS[cat] || '📁';
+            const ico = CAT_ICONS[cat] || '';
 
             document.getElementById('catFilterBar').classList.add('visible');
             document.getElementById('catFilterIco').textContent = ico;
@@ -1975,7 +1910,7 @@
             const count = document.getElementById('catResCount');
             const resIco = document.getElementById('catResIco');
 
-            resIco.textContent = ico || '📁';
+            resIco.textContent = ico || '';
             title.textContent = catName;
             count.textContent = articles.length + ' articles';
 
@@ -2003,7 +1938,7 @@
         function renderArticleCatBadge() {
             if (!selectedItem) return;
             const cat = getCategoryFromArticle(selectedItem);
-            const ico = cat ? (CAT_ICONS[cat] || '📁') : '📁';
+            const ico = cat ? (CAT_ICONS[cat] || '') : '';
             const badgeRow = document.getElementById('articleCatBadgeRow');
             const badge = document.getElementById('articleCatBadge');
             if (cat) {
@@ -2041,7 +1976,7 @@
         function processLocalVideo(event) {
             const files = Array.from(event.target.files);
             if (!files.length) return;
-            if (!selectedItem) { alert("Pehle koi article open karo."); return; }
+            if (!selectedItem) { alert("."); return; }
             if (!selectedItem.videos) selectedItem.videos = [];
 
             let loaded = 0;
@@ -2084,7 +2019,7 @@
                             <div class="video-play-btn" id="vpb-${i}">▶</div>
                         </div>
                         <div class="video-item-label">
-                            <span>🎥 ${v.name || 'Video ' + (i+1)}</span>
+                            <span>${v.name || 'Video ' + (i+1)}</span>
                             <button class="video-dl-btn" onclick="downloadVideo(${i})">⬇ Download</button>
                         </div>
                         ${isEditStateActive ? `<div style="padding:4px 10px 8px;background:#111;"><button onclick="deleteVideo(${i})" style="background:none;border:1px solid #d33;color:#f66;font-size:11px;padding:2px 8px;border-radius:3px;cursor:pointer;">🗑 Remove</button></div>` : ''}
@@ -2099,7 +2034,7 @@
             if (vid.paused) {
                 vid.play();
                 ov.classList.add('playing');
-                pb.textContent = '⏸';
+                pb.textContent = '';
             } else {
                 vid.pause();
                 ov.classList.remove('playing');
