@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Copedia</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            padding: 12px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .wiki-wrapper {
+            width: 100%;
+            max-width: 420px;
+            margin-top: 5vh;
+        }
+
+        /* ADMIN BAR */
+        .secret-admin-bar {
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 2px dashed #3366cc;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+        }
+        .btn-action {
+            background-color: #ffffff;
+            color: #3366cc;
+            border: 1px solid #a2a9b1;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .btn-action:hover {
+            background-color: #f8f9fa;
+            border-color: #3366cc;
+        }
+        .btn-danger {
+            color: #d33;
+        }
+        .btn-danger:hover {
+            background-color: #fff5f5;
+            border-color: #d33;
+        }
+
+        /* SEARCH VIEW */
+        .search-view {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        .brand-header {
+            margin-bottom: 24px;
+        }
+        .brand-title {
+            font-family: 'Georgia', serif;
+            font-size: 2.6rem;
+            color: #000000;
+            letter-spacing: 0.5px;
+        }
+        .brand-subtitle {
+            font-size: 11px;
+            color: #202122;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* SEARCH BOX */
+        .search-box-frame {
+            position: relative;
+            display: flex;
+            width: 100%;
+            border: 1px solid #a2a9b1;
+            background-color: #ffffff;
+            border-radius: 2px;
+        }
+        .globe-box {
+            background-color: #f8f9fa;
+            border-right: 1px solid #a2a9b1;
+            width: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .input-field {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            background: transparent;
+            color: #000000;
+            outline: none;
+        }
+        .search-icon-button {
+            background-color: #3366cc;
+            border: none;
+            width: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .dropdown-suggestions {
+            position: absolute;
+            top: 100%;
+            left: -1px;
+            right: -1px;
+            background-color: #ffffff;
+            border: 1px solid #a2a9b1;
+            border-top: none;
+            max-height: 340px;
+            overflow-y: auto;
+            z-index: 99;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .box-row-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eaecf0;
+            cursor: pointer;
+            text-align: left;
+        }
+        .box-row-item:hover {
+            background-color: #f8f9fa;
+        }
+        .row-thumb-frame {
+            width: 46px;
+            height: 46px;
+            object-fit: cover;
+            margin-right: 12px;
+            border: 1px solid #c8ccd1;
+            background-color: #f8f9fa;
+        }
+        .row-text-meta h4 {
+            font-size: 15px;
+            color: #3366cc;
+            font-weight: 600;
+        }
+        .row-text-meta p {
+            font-size: 12px;
+            color: #202122;
+            margin-top: 2px;
+        }
+
+        /* SPINNING GLOBE */
+        @keyframes globeRotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .globe-svg {
+            width: 30px;
+            height: 30px;
+        }
+        .globe-spin {
+            animation: globeRotate 5s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        /* DETAIL CARD */
+        .detail-infocard-view {
+            display: none;
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid #a2a9b1;
+        }
+        .nav-header-row {
+            padding: 8px 0;
+            background-color: #ffffff;
+            width: 100%;
+            display: none;
+            text-align: left;
+        }
+        .back-link-btn {
+            background: none;
+            border: none;
+            color: #3366cc;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .card-main-title {
+            background-color: #eaecf0;
+            padding: 12px;
+            text-align: center;
+            font-size: 19px;
+            font-weight: 500;
+            border-bottom: 1px solid #a2a9b1;
+            color: #3366cc;
+        }
+
+        /* CAROUSEL */
+        .card-image-box {
+            padding: 16px;
+            text-align: center;
+            position: relative;
+        }
+        .carousel-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .card-img-element {
+            max-width: 100%;
+            max-height: 290px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #c8ccd1;
+            width: 100%;
+        }
+        .carousel-arrow {
+            display: none;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.45);
+            color: #fff;
+            border: none;
+            width: 30px;
+            height: 52px;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 2px;
+            line-height: 52px;
+            text-align: center;
+            padding: 0;
+            user-select: none;
+        }
+        .carousel-arrow.left {
+            left: 0;
+        }
+        .carousel-arrow.right {
+            right: 0;
+        }
+        .carousel-dots {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            min-height: 14px;
+        }
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #c8ccd1;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+        }
+        .carousel-dot.active {
+            background: #3366cc;
+        }
+        .photo-upload-trigger {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #3366cc;
+            border: 1px dashed #3366cc;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .card-img-caption {
+            font-size: 12px;
+            color: #000000;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* DATA ROWS */
+        .card-data-row {
+            display: flex;
+            width: 100%;
+            border-top: 1px solid #a2a9b1;
+            font-size: 13px;
+            position: relative;
+        }
+        .card-cell-label {
+            width: 35%;
+            background-color: #eaecf0;
+            padding: 10px;
+            font-weight: bold;
+            color: #000000;
+            border-right: 1px solid #a2a9b1;
+        }
+        .card-cell-value {
+            width: 65%;
+            padding: 10px;
+            color: #000000;
+            line-height: 1.4;
+            padding-right: 30px;
+        }
+        .delete-row-icon {
+            display: none;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d33;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 2px 5px;
+        }
+
+        /* DESCRIPTION ROW */
+        .desc-row {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            border-top: 1px solid #a2a9b1;
+            font-size: 13px;
+        }
+        .desc-row.visible {
+            display: flex;
+        }
+        .desc-label {
+            background-color: #eaecf0;
+            padding: 8px 10px;
+            font-weight: bold;
+            font-size: 12px;
+            color: #000;
+            border-bottom: 1px solid #a2a9b1;
+        }
+        .desc-textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 10px;
+            font-size: 13px;
+            color: #000;
+            background: #fff;
+            border: none;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+        .desc-textarea[contenteditable="false"] {
+            background: #f8f9fa;
+            cursor: default;
+        }
+
+        /* BOTTOM ACTION ROW */
+        .bottom-action-row {
+            padding: 10px 12px;
+            background-color: #eaecf0;
+            border-top: 1px solid #a2a9b1;
+            display: none;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .bottom-action-row.visible {
+            display: flex;
+        }
+
+        [contenteditable="true"] {
+            outline: 1px dashed #3366cc !important;
+            background-color: rgba(51, 102, 204, 0.06);
+        }
+
+        /* CREATE MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: #ffffff;
+            border: 1px solid #a2a9b1;
+            border-radius: 4px;
+            width: 92%;
+            max-width: 400px;
+            max-height: 88vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            background-color: #eaecf0;
+            border-bottom: 1px solid #a2a9b1;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            font-size: 16px;
+            color: #3366cc;
+            font-weight: 600;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #555;
+            cursor: pointer;
+        }
+        .modal-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 4px;
+        }
+        .modal-field input {
+            width: 100%;
+            border: 1px solid #a2a9b1;
+            border-radius: 2px;
+            padding: 9px 10px;
+            font-size: 14px;
+            color: #000;
+            background: #fff;
+            outline: none;
+            font-family: inherit;
+        }
+        .modal-field input:focus {
+            border-color: #3366cc;
+        }
+        .modal-row-fields {
+            border: 1px solid #eaecf0;
+            border-radius: 2px;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+        .modal-row-fields label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .modal-row-entry {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .modal-row-entry input {
+            flex: 1;
+            border: 1px solid #a2a9b1;
+            border-radius: 2px;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+        .modal-row-add-btn {
+            background: none;
+            border: 1px dashed #3366cc;
+            color: #3366cc;
+            font-size: 12px;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 2px;
+            width: 100%;
+            margin-top: 4px;
+        }
+        .modal-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #eaecf0;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .modal-btn-create {
+            background: #3366cc;
+            color: #fff;
+            border: none;
+            padding: 9px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .modal-btn-cancel {
+            background: #fff;
+            color: #555;
+            border: 1px solid #a2a9b1;
+            padding: 9px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        /* ===== CATEGORY SYSTEM ===== */
+        .category-section {
+            margin-top: 20px;
+        }
+        .category-section-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #54595d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .category-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            border-radius: 16px;
+            padding: 7px 14px;
+            font-size: 13px;
+            color: #0645ad;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            user-select: none;
+        }
+        .category-chip:hover {
+            background: #eaf0fb;
+            border-color: #3366cc;
+        }
+        .category-chip.active {
+            background: #3366cc;
+            color: #fff;
+            border-color: #3366cc;
+        }
+        .category-chip-ico {
+            font-size: 15px;
+        }
+        .category-chip-count {
+            font-size: 11px;
+            opacity: .7;
+        }
+
+        /* Category back button in search */
+        .cat-filter-bar {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: #eaf0fb;
+            border: 1px solid #3366cc;
+            border-radius: 4px;
+            padding: 7px 12px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .cat-filter-bar.visible {
+            display: flex;
+        }
+        .cat-filter-name {
+            font-weight: bold;
+            color: #3366cc;
+            flex: 1;
+        }
+        .cat-clear-btn {
+            background: none;
+            border: none;
+            color: #d33;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Category badge on article */
+        .article-cat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eaf0fb;
+            border: 1px solid #c8d8f0;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: 11px;
+            color: #3366cc;
+            margin: 0 16px 0;
+        }
+
+        /* Category selector in edit */
+        .cat-select-row {
+            display: none;
+            width: 100%;
+            border-top: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .cat-select-row.visible {
+            display: flex;
+        }
+        .cat-select-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #54595d;
+        }
+        .cat-select {
+            border: 1px solid #a2a9b1;
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-size: 13px;
+            background: #fff;
+            color: #000;
+            outline: none;
+        }
+
+        /* ===== VIDEO SECTION ===== */
+        .video-section {
+            padding: 0 16px 12px;
+        }
+        .video-item {
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .video-item video {
+            width: 100%;
+            max-height: 240px;
+            display: block;
+            background: #000;
+        }
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .video-overlay.playing {
+            background: transparent;
+        }
+        .video-overlay.playing:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .video-play-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.2s;
+        }
+        .video-overlay.playing .video-play-btn {
+            opacity: 0;
+        }
+        .video-overlay.playing:hover .video-play-btn {
+            opacity: .7;
+        }
+        .video-item-label {
+            background: #000;
+            color: #ccc;
+            font-size: 11px;
+            padding: 4px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .video-dl-btn {
+            background: none;
+            border: 1px solid #555;
+            color: #aaa;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .video-dl-btn:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        /* Video upload trigger */
+        .video-upload-trigger {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            color: #3366cc;
+            border: 1px dashed #3366cc;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 16px 8px;
+            cursor: pointer;
+            border-radius: 2px;
+            text-align: center;
+        }
+        .video-upload-section-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #54595d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 6px 16px 4px;
+            display: none;
+        }
+        .video-upload-section-label.visible {
+            display: block;
+        }
+
+        /* CATEGORY RESULTS PANEL */
+        .cat-results-panel {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+            border: 1px solid #a2a9b1;
+            border-radius: 4px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .cat-results-panel.open {
+            display: block;
+        }
+        .cat-results-header {
+            background: #eaecf0;
+            border-bottom: 1px solid #a2a9b1;
+            padding: 9px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+        }
+        .cat-results-header .cat-res-count {
+            margin-left: auto;
+            font-size: 11px;
+            color: #54595d;
+            font-weight: normal;
+        }
+        .cat-result-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid #eaecf0;
+            cursor: pointer;
+        }
+        .cat-result-item:last-child {
+            border-bottom: none;
+        }
+        .cat-result-item:hover {
+            background: #f8f9fa;
+        }
+        .cat-result-thumb {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border: 1px solid #c8ccd1;
+            margin-right: 12px;
+            flex-shrink: 0;
+            background: #f8f9fa;
+        }
+        .cat-result-title {
+            font-size: 14px;
+            color: #3366cc;
+            font-weight: 600;
+        }
+        .cat-result-sub {
+            font-size: 12px;
+            color: #54595d;
+            margin-top: 2px;
+        }
+
+        /* Photo download hint */
+        .photo-dl-hint {
+            font-size: 10px;
+            color: #72777d;
+            text-align: center;
+            padding-bottom: 4px;
+            display: none;
+        }
+        .photo-dl-hint.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="wiki-wrapper">
+
+        <div class="secret-admin-bar" id="secretAdminBar">
+            <button class="btn-action" onclick="openCreateModal()">+ Create Article</button>
+            <span style="color:#3366cc;font-size:12px;font-weight:bold;">EDIT MODE</span>
+            <button class="btn-action btn-danger" id="deleteArticleBtn" onclick="deleteCurrentArticle()" style="display:none;">Delete Page</button>
+        </div>
+
+        <div class="nav-header-row" id="navHeader">
+            <button class="back-link-btn" onclick="resetToSearchView()">Back to Search</button>
+        </div>
+
+        <div class="search-view" id="searchView">
+            <div class="brand-header">
+                <div class="brand-title">Copedia</div>
+                <div class="brand-subtitle">The All Create World Information</div>
+            </div>
+            <div class="search-box-frame">
+                <div class="globe-box">
+                    <svg class="globe-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <clipPath id="globeClip"><circle cx="50" cy="50" r="46" /></clipPath>
+                            <radialGradient id="oceanGrad" cx="40%" cy="35%">
+                                <stop offset="0%" stop-color="#5b9bd5" />
+                                <stop offset="100%" stop-color="#1a5fa8" />
+                            </radialGradient>
+                            <radialGradient id="globeShine" cx="35%" cy="30%">
+                                <stop offset="0%" stop-color="white" stop-opacity="0.35" />
+                                <stop offset="60%" stop-color="white" stop-opacity="0" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="46" fill="url(#oceanGrad)" />
+                        <g class="globe-spin" clip-path="url(#globeClip)">
+                            <line x1="4" y1="50" x2="96" y2="50" stroke="#4a8fc4" stroke-width="0.6" stroke-opacity="0.5" />
+                            <ellipse cx="50" cy="50" rx="46" ry="15" fill="none" stroke="#4a8fc4" stroke-width="0.5" stroke-opacity="0.4" />
+                            <ellipse cx="50" cy="50" rx="46" ry="30" fill="none" stroke="#4a8fc4" stroke-width="0.5" stroke-opacity="0.3" />
+                            <ellipse cx="50" cy="50" rx="12" ry="46" fill="none" stroke="#4a8fc4" stroke-width="0.5" stroke-opacity="0.4" />
+                            <ellipse cx="50" cy="50" rx="28" ry="46" fill="none" stroke="#4a8fc4" stroke-width="0.5" stroke-opacity="0.4" />
+                            <path d="M44,18 L48,16 L53,18 L55,22 L54,27 L56,30 L55,35 L52,38 L50,44 L48,50 L46,55 L44,60 L42,65 L40,62 L39,57 L41,52 L40,47 L38,42 L37,36 L38,30 L40,25 Z" fill="#3a9e5f" opacity="0.9" />
+                            <path d="M18,22 L22,20 L26,22 L28,26 L27,32 L25,36 L24,42 L22,48 L20,54 L18,58 L16,54 L15,48 L16,42 L15,36 L14,30 L15,25 Z" fill="#2d8a50" opacity="0.9" />
+                            <path d="M20,60 L24,58 L26,62 L25,68 L22,73 L19,75 L17,72 L16,67 L17,62 Z" fill="#2d8a50" opacity="0.85" />
+                            <path d="M58,16 L65,14 L72,16 L78,20 L80,26 L78,30 L72,32 L68,35 L62,34 L57,30 L55,25 L57,20 Z" fill="#3aad68" opacity="0.9" />
+                            <path d="M64,34 L70,33 L76,36 L78,42 L75,46 L70,48 L64,46 L61,42 L62,37 Z" fill="#3aad68" opacity="0.85" />
+                            <path d="M72,60 L78,58 L82,62 L81,68 L77,71 L72,70 L69,66 L70,61 Z" fill="#4ab87a" opacity="0.8" />
+                            <ellipse cx="50" cy="90" rx="30" ry="8" fill="#dff0ff" opacity="0.6" />
+                        </g>
+                        <circle cx="50" cy="50" r="46" fill="url(#globeShine)" />
+                        <circle cx="50" cy="50" r="46" fill="none" stroke="#1a5fa8" stroke-width="2" />
+                    </svg>
+                </div>
+                <input type="text" class="input-field" id="mainSearchInput" placeholder="Search articles..." autocomplete="off">
+                <button class="search-icon-button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                </button>
+                <div class="dropdown-suggestions" id="dropdownSuggestions"></div>
+            </div>
+
+            <!-- CATEGORY FILTER BAR -->
+            <div class="cat-filter-bar" id="catFilterBar">
+                <span style="font-size:16px" id="catFilterIco">📁</span>
+                <span class="cat-filter-name" id="catFilterName">All</span>
+                <button class="cat-clear-btn" onclick="clearCategoryFilter()">✕ Clear</button>
+            </div>
+
+            <!-- CATEGORIES GRID -->
+            <div class="category-section" id="categorySection">
+                <div class="category-section-title">Browse by Category</div>
+                <div class="category-grid" id="categoryGrid"></div>
+            </div>
+
+            <!-- CATEGORY RESULTS PANEL -->
+            <div class="cat-results-panel" id="catResultsPanel">
+                <div class="cat-results-header">
+                    <span id="catResIco">📁</span>
+                    <span id="catResTitle">Category</span>
+                    <span class="cat-res-count" id="catResCount">0 articles</span>
+                </div>
+                <div id="catResList"></div>
+            </div>
+        </div>
+
+        <div class="detail-infocard-view" id="detailInfocardView">
+            <div class="card-main-title" id="cardTitleHolder" contenteditable="false" onblur="updateTextData('title',this)">Title</div>
+
+            <div class="card-image-box">
+                <div class="carousel-wrapper">
+                    <button class="carousel-arrow left" id="arrowLeft" onclick="carouselMove(-1)">&#8249;</button>
+                    <img src="" class="card-img-element" id="cardImageHolder">
+                    <button class="carousel-arrow right" id="arrowRight" onclick="carouselMove(1)">&#8250;</button>
+                </div>
+                <div class="carousel-dots" id="carouselDots"></div>
+                <div id="photoUploadTrigger" class="photo-upload-trigger" onclick="document.getElementById('galleryFileInput').click()">Add Photo</div>
+                <div class="card-img-caption" id="cardCaptionHolder" contenteditable="false" onblur="updateTextData('caption',this)">Caption</div>
+                <div class="photo-dl-hint" id="photoDlHint">📥 Long press photo to save</div>
+            </div>
+            <input type="file" id="galleryFileInput" accept="image/*" multiple style="position:fixed;top:-9999px;left:-9999px;" onchange="processLocalImage(event)">
+            <input type="file" id="videoFileInput" accept="video/*" multiple style="position:fixed;top:-9999px;left:-9999px;" onchange="processLocalVideo(event)">
+
+            <!-- Article category badge -->
+            <div id="articleCatBadgeRow" style="padding:6px 16px 2px; display:none;">
+                <span class="article-cat-badge" id="articleCatBadge">📁 —</span>
+            </div>
+
+            <!-- Category selector (edit mode) -->
+            <div class="cat-select-row" id="catSelectRow">
+                <span class="cat-select-label">Category:</span>
+                <select class="cat-select" id="catSelectEl" onchange="setCategoryFromSelect(this.value)">
+                    <option value="">— None —</option>
+                    <option value="Education">🎓 Education</option>
+                    <option value="Sports">⚽ Sports</option>
+                    <option value="Technology">💻 Technology</option>
+                    <option value="Science">🔬 Science</option>
+                    <option value="History">📜 History</option>
+                    <option value="Geography">🌍 Geography</option>
+                    <option value="Arts">🎨 Arts</option>
+                    <option value="Music">🎵 Music</option>
+                    <option value="Business">💼 Business</option>
+                    <option value="Politics">🏛️ Politics</option>
+                    <option value="Health">🏥 Health</option>
+                    <option value="Food">🍽️ Food</option>
+                    <option value="Travel">✈️ Travel</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Finance">💰 Finance</option>
+                    <option value="Nature">🌿 Nature</option>
+                    <option value="Religion">🕌 Religion</option>
+                    <option value="Language">📖 Language</option>
+                    <option value="Military">⚔️ Military</option>
+                    <option value="Law">⚖️ Law</option>
+                    <option value="Organization">🏢 Organization</option>
+                    <option value="Software / App">📱 Software / App</option>
+                    <option value="Corporation">🏗️ Corporation</option>
+                    <option value="Country">🌐 Country</option>
+                    <option value="Person">👤 Person</option>
+                    <option value="Q&A">❓ Q&amp;A</option>
+                    <option value="Other">📌 Other</option>
+                </select>
+            </div>
+
+            <div id="cardRowsContainer"></div>
+
+            <!-- Video section -->
+            <div class="video-upload-section-label" id="videoSectionLabel">🎥 Videos</div>
+            <div class="video-upload-trigger" id="videoUploadTrigger" onclick="document.getElementById('videoFileInput').click()">🎥 Add Video</div>
+            <div class="video-section" id="videoSection"></div>
+
+            <div class="bottom-action-row" id="bottomActionRow">
+                <button class="btn-action" onclick="addNewInfoRow()">+ Add Row</button>
+                <button class="btn-action" id="addDescBtn" onclick="toggleDescription()">+ Add Description</button>
+            </div>
+
+            <div class="desc-row" id="descRow">
+                <div class="desc-label">More information</div>
+                <div class="desc-textarea" id="descTextarea" contenteditable="false" onblur="updateTextData('notes',this)"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Create Article</h3>
+                <button class="modal-close" onclick="closeCreateModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-field">
+                    <label>Article Title *</label>
+                    <input type="text" id="mTitle" placeholder="e.g. India, My Profile, London...">
+                </div>
+                <div class="modal-field">
+                    <label>Subtitle / Short Description</label>
+                    <input type="text" id="mSubtitle" placeholder="e.g. Country in South Asia">
+                </div>
+                <div class="modal-field">
+                    <label>Category</label>
+                    <select id="modalCatSelect" style="width:100%;border:1px solid #a2a9b1;border-radius:2px;padding:9px 10px;font-size:14px;color:#000;background:#fff;outline:none;">
+                        <option value="">— None —</option>
+                        <option value="Education">🎓 Education</option>
+                        <option value="Sports">⚽ Sports</option>
+                        <option value="Technology">💻 Technology</option>
+                        <option value="Science">🔬 Science</option>
+                        <option value="History">📜 History</option>
+                        <option value="Geography">🌍 Geography</option>
+                        <option value="Arts">🎨 Arts</option>
+                        <option value="Music">🎵 Music</option>
+                        <option value="Business">💼 Business</option>
+                        <option value="Politics">🏛️ Politics</option>
+                        <option value="Health">🏥 Health</option>
+                        <option value="Food">🍽️ Food</option>
+                        <option value="Travel">✈️ Travel</option>
+                        <option value="Entertainment">🎬 Entertainment</option>
+                        <option value="Finance">💰 Finance</option>
+                        <option value="Nature">🌿 Nature</option>
+                        <option value="Religion">🕌 Religion</option>
+                        <option value="Language">📖 Language</option>
+                        <option value="Law">⚖️ Law</option>
+                        <option value="Other">📌 Other</option>
+                    </select>
+                </div>
+                <div class="modal-row-fields">
+                    <label>Info Rows (Label → Value)</label>
+                    <div id="modalRowsContainer">
+                        <div class="modal-row-entry">
+                            <input type="text" placeholder="Label" class="mRowLabel">
+                            <input type="text" placeholder="Value" class="mRowValue">
+                        </div>
+                    </div>
+                    <button class="modal-row-add-btn" onclick="addModalRow()"> Row Add </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn-cancel" onclick="closeCreateModal()">Cancel</button>
+                <button class="modal-btn-create" onclick="submitCreateArticle()"> Article </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== JSON-LD DATA =====
+        const jsonLdData = {
+            "@context": {
+                "@vocab": "https://schema.org/",
+                "aliases": "https://msearch.example/vocab#aliases",
+                "about": "description",
+                "founder": "founder",
+                "owner": "owns",
+                "created": "foundingDate",
+                "category": "additionalType",
+                "full_name": "legalName",
+                "total_company": "numberOfEmployees",
+                "network": "https://msearch.example/vocab#network",
+                "location": "location",
+                "capital": "https://msearch.example/vocab#capital",
+                "continent": "https://msearch.example/vocab#continent",
+                "member": "https://msearch.example/vocab#memberCount",
+                "leader": "https://msearch.example/vocab#leader",
+                "headquarter": "https://msearch.example/vocab#headquarter",
+                "under": "https://msearch.example/vocab#under",
+                "full_form": "https://msearch.example/vocab#fullForm",
+                "first_game": "https://msearch.example/vocab#firstGame",
+                "second_game": "https://msearch.example/vocab#secondGame",
+                "student_created": "https://msearch.example/vocab#studentCreated",
+                "total_apps": "https://msearch.example/vocab#totalApps"
+            },
+            "@graph": [
+                { "@id": "https://msearch.example/entity/m-search", "@type": "SoftwareApplication", "name": "M Search",
+                    "aliases": ["msearch", "m search"], "about": "M Search is a mini search engine.",
+                    "founder": "M.H", "owner": "MGPLC", "created": "2023" },
+                { "@id": "https://msearch.example/entity/mgplc", "@type": "Corporation", "name": "MGPLC",
+                    "aliases": ["m group private limited", "m group pvt Ltd", "mgplc"],
+                    "full_name": "M GROUP PRIVATE LIMITED COMPANY",
+                    "about": "MGPLC is the parent company of M Search and 18 other companies.", "founder": "M.H",
+                    "owner": "M.H", "created": "2017", "total_company": "18", "network": "1.2 Trillion MSDR",
+                    "hasPart": ["M SEARCH ALL", "TSC Club", "TComputer", "TC", "XCAR", "DEDF GROUP", "LO", "DAMER", "DX",
+                        "BANK OF Mcity", "ORL", "MNEWS", "ESM AIRLINE", "STD SODA", "UN", "OUT STUDIO", "Hoill",
+                        "ALLONE", "ETC"
+                    ] },
+                { "@id": "https://msearch.example/entity/pretext-program", "@type": "SoftwareApplication",
+                    "name": "Pretext Program", "aliases": ["pretext program", "pretextprogram"],
+                    "about": "Pretext Program is the first testing files data transfer into digital data successfully.",
+                    "founder": "M.H", "created": "2026-01-15" },
+                { "@id": "https://msearch.example/entity/mh", "@type": "Person", "name": "M.H",
+                    "aliases": ["mehdi hasan", "m h"], "full_name": "Mehdi Hasan",
+                    "about": "M.H is creator of M Search, Pretext Program, and founder of MGPLC.",
+                    "jobTitle": "Founder and Creator" },
+                { "@id": "https://msearch.example/entity/atabb", "@type": "MobileApplication", "name": "ATABB",
+                    "aliases": ["atabb app", "atabb", "atabb company", "atabb online"],
+                    "about": "ATABB is the first entertainment app and online company.", "owner": "ATABB",
+                    "category": "Entertainment", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/pplco", "@type": "MobileApplication", "name": "PPLCO",
+                    "aliases": ["pplco app"], "about": "PPLCO is an entertainment app.", "owner": "PPLCO",
+                    "category": "Entertainment", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/redx", "@type": "MobileApplication", "name": "REDX",
+                    "aliases": ["redx app"], "about": "REDX is an entertainment app.", "owner": "REDX COMPANY",
+                    "category": "Entertainment", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/music-one", "@type": "MobileApplication", "name": "Music ONE",
+                    "aliases": ["music one app"], "about": "Music ONE is a music streaming app.",
+                    "owner": "MUSIC ONE", "category": "Music", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/cpay", "@type": "MobileApplication", "name": "CPAY",
+                    "aliases": ["cpay app"], "about": "CPAY is a payment app.", "owner": "CPAY", "category": "Finance",
+                    "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/ssbpay", "@type": "MobileApplication", "name": "SSBPAY",
+                    "aliases": ["ssbpay app"], "about": "SSBPAY is a digital payment app.", "owner": "State so bank",
+                    "category": "Finance", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/food-on", "@type": "MobileApplication", "name": "FOOD ON",
+                    "aliases": ["food on app"], "about": "FOOD ON is a food delivery app.", "owner": "FOOD ON",
+                    "category": "Food", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/mnews", "@type": "Organization", "name": "MNEWS",
+                    "aliases": ["mnews app"], "about": "MNEWS is a news company and media app.", "owner": "MGPLC",
+                    "category": "News", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/turbo", "@type": "MobileApplication", "name": "TURBO",
+                    "aliases": ["turbo app"], "about": "TURBO is a share market app.", "owner": "TURBO",
+                    "category": "Finance", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/edi", "@type": "MobileApplication", "name": "EDI",
+                    "aliases": ["edi app"], "about": "EDI is a stock market app.", "owner": "EDI", "category": "Finance",
+                    "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/m-messege", "@type": "MobileApplication", "name": "M Messege",
+                    "aliases": ["m messege app", "my talk"], "about": "M Messege is a messaging app.",
+                    "owner": "MGPLC", "category": "Communication", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/m-phone", "@type": "MobileApplication", "name": "M Phone",
+                    "aliases": ["m phone app"], "about": "M Phone is a phone utility app.", "owner": "MGPLC",
+                    "category": "Communication", "created": "2024-12-05" },
+                { "@id": "https://msearch.example/entity/mapp", "@type": "MobileApplication", "name": "MAPP",
+                    "aliases": ["mapp app"], "about": "MAPP is the holding app of all apps.", "owner": "MGPLC",
+                    "category": "Utility", "created": "2024-12-05", "total_apps": "48" },
+                { "@id": "https://msearch.example/entity/university-mew", "@type": "EducationalOrganization",
+                    "name": "University of M Desh Education World", "aliases": ["university of m.e.w", "mew"],
+                    "about": "University of M Desh Education World.", "location": "Mcity", "created": "2026-02-02" },
+                { "@id": "https://msearch.example/entity/university-treepers", "@type": "EducationalOrganization",
+                    "name": "University of Treepers", "aliases": ["treepers university"],
+                    "about": "University of TREEPERS.", "location": "SPL", "created": "2026-02-03" },
+                { "@id": "https://msearch.example/entity/student-of-college", "@type": "EducationalOrganization",
+                    "name": "Students of College", "aliases": ["students of collage"],
+                    "about": "Students of College.", "location": "AMRS", "student_created": "2026-02-03" },
+                { "@id": "https://msearch.example/entity/ibc", "@type": "Organization", "name": "IBC",
+                    "aliases": ["international broadcasting company", "ibc company"],
+                    "full_form": "International Broadcasting Company",
+                    "about": "IBC is an international broadcasting company working with government.",
+                    "created": "2025-05-20", "under": "M Desh Government" },
+                { "@id": "https://msearch.example/entity/cwi", "@type": "SoftwareApplication", "name": "CWI",
+                    "aliases": ["creat world intelligent", "cwi"], "full_form": "Creat World Intelligent",
+                    "about": "CWI is a system used for saving file data.", "category": "Data System",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/centor-international-game", "@type": "Organization",
+                    "name": "Centor International Game", "aliases": ["centor game", "cig", "centor"],
+                    "about": "International Game Center is a gaming center.", "created": "2024",
+                    "first_game": "Swimming Game (2024)", "second_game": "Running Game (2025)" },
+                { "@id": "https://msearch.example/entity/creat-world", "@type": "Organization", "name": "Creat World",
+                    "aliases": ["create world"], "about": "Creat World is created between 2018 and 2019.",
+                    "founder": "M.H", "created": "2018-2019" },
+                { "@id": "https://msearch.example/entity/ac", "@type": "Organization", "name": "AC",
+                    "aliases": ["ac company"], "about": "AC is an internal company.", "category": "Internal",
+                    "created": "2020" },
+                { "@id": "https://msearch.example/entity/aoil", "@type": "Organization", "name": "AOIL",
+                    "aliases": ["aoil company"], "about": "AOIL is an oil company.", "category": "Oil",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/apl", "@type": "Organization", "name": "APL",
+                    "aliases": ["apl company"], "about": "APL is a power company.", "category": "Power",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/allone", "@type": "Organization", "name": "ALLONE",
+                    "aliases": ["allone company"], "about": "ALLONE is an internal company.", "category": "Internal",
+                    "owner": "MGPLC", "created": "2023" },
+                { "@id": "https://msearch.example/entity/9a9a", "@type": "Organization", "name": "9A9A",
+                    "aliases": ["9a9a company"], "about": "9A9A is a medicine company.", "category": "Medicine",
+                    "created": "2023" },
+                { "@id": "https://msearch.example/entity/abm", "@type": "Organization", "name": "ABM",
+                    "aliases": ["abm company"], "about": "ABM is an unknown type company.", "category": "Unknown",
+                    "created": "2023" },
+                { "@id": "https://msearch.example/entity/astc", "@type": "Organization", "name": "ASTC",
+                    "aliases": ["astc company"], "about": "ASTC is an advertising company.", "category": "Advertising",
+                    "created": "2024" },
+                { "@id": "https://msearch.example/entity/alb", "@type": "Organization", "name": "ALB",
+                    "aliases": ["alb company"], "about": "ALB is an unknown type company.", "category": "Unknown",
+                    "created": "2022" },
+                { "@id": "https://msearch.example/entity/adc", "@type": "Organization", "name": "ADC",
+                    "aliases": ["adc company"], "about": "ADC is a channel company.", "category": "Channel",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/adplc", "@type": "Organization", "name": "ADPLC",
+                    "aliases": ["adplc company"], "about": "ADPLC is an internal company.", "category": "Internal",
+                    "created": "2025-08-29" },
+                { "@id": "https://msearch.example/entity/ao", "@type": "Organization", "name": "AO",
+                    "aliases": ["ao company"], "about": "AO is an unknown type company.", "category": "Unknown",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/bpl", "@type": "Organization", "name": "BPL",
+                    "aliases": ["bpl company"], "about": "BPL is a power company.", "category": "Power",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/bk", "@type": "Organization", "name": "BK",
+                    "aliases": ["bk company"], "about": "BK is a food company.", "category": "Food",
+                    "created": "2024" },
+                { "@id": "https://msearch.example/entity/bbs", "@type": "Organization", "name": "BBS",
+                    "aliases": ["bbs company"], "about": "BBS is a mobile company.", "category": "Mobile",
+                    "owner": "Lo mobile company", "created": "2022" },
+                { "@id": "https://msearch.example/entity/bus", "@type": "Organization", "name": "BUS",
+                    "aliases": ["bus company"], "about": "BUS is a travel company.", "category": "Travel",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/bnc", "@type": "EducationalOrganization", "name": "BNC",
+                    "aliases": ["bnc company"], "about": "BNC is an education company.", "category": "Education",
+                    "under": "M Desh Government", "created": "2021" },
+                { "@id": "https://msearch.example/entity/blue", "@type": "Organization", "name": "BLUE",
+                    "aliases": ["blue company"], "about": "BLUE is a dress company.", "category": "Dress",
+                    "created": "2023" },
+                { "@id": "https://msearch.example/entity/bbd", "@type": "Organization", "name": "BBD",
+                    "aliases": ["bbd company"], "about": "BBD is an unknown type company.", "category": "Unknown",
+                    "created": "2023" },
+                { "@id": "https://msearch.example/entity/bank-of-mcity", "@type": "BankOrCreditUnion",
+                    "name": "Bank of Mcity", "aliases": ["mcity bank"], "about": "Bank of Mcity is a banking company.",
+                    "category": "Banking", "owner": "MGPLC", "created": "2024" },
+                { "@id": "https://msearch.example/entity/co", "@type": "Organization", "name": "CO",
+                    "aliases": ["co company"], "about": "CO is an internal company.", "category": "Internal",
+                    "created": "2020" },
+                { "@id": "https://msearch.example/entity/coll", "@type": "Organization", "name": "COLL",
+                    "aliases": ["coll company"], "about": "COLL is a toothpaste company.", "category": "Toothpaste",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/cra", "@type": "Organization", "name": "CRA",
+                    "aliases": ["cra company"], "about": "CRA is a car company.", "category": "Car", "created": "2021" },
+                { "@id": "https://msearch.example/entity/con", "@type": "Organization", "name": "CON",
+                    "aliases": ["con company"], "about": "CON is an internal company.", "category": "Internal",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/cf-bank", "@type": "BankOrCreditUnion", "name": "CF Bank",
+                    "aliases": ["cfbank"], "about": "CF Bank is a banking company.", "category": "Banking",
+                    "created": "2024" },
+                { "@id": "https://msearch.example/entity/cg", "@type": "Organization", "name": "CG",
+                    "aliases": ["cg company"], "about": "CG is an unknown type company.", "category": "Unknown",
+                    "created": "2023" },
+                { "@id": "https://msearch.example/entity/damer", "@type": "Organization", "name": "DAMER",
+                    "aliases": ["damer company"], "about": "DAMER is a cement company.", "category": "Cement",
+                    "under": "DEDF Group", "created": "2020" },
+                { "@id": "https://msearch.example/entity/dx", "@type": "Organization", "name": "DX",
+                    "aliases": ["dx company"], "about": "DX is a medicine company.", "category": "Medicine",
+                    "under": "DEDF Group", "created": "2021" },
+                { "@id": "https://msearch.example/entity/dd", "@type": "Organization", "name": "DD",
+                    "aliases": ["dd company"], "about": "DD is a mobile company.", "category": "Mobile",
+                    "created": "2022" },
+                { "@id": "https://msearch.example/entity/ddg", "@type": "Organization", "name": "DDG",
+                    "aliases": ["ddg company"], "about": "DDG is a car company.", "category": "Car", "created": "2021" },
+                { "@id": "https://msearch.example/entity/dedf-group", "@type": "Corporation", "name": "DEDF Group",
+                    "aliases": ["dedf"], "about": "DEDF Group is a group company.", "category": "Group",
+                    "owner": "MGPLC", "created": "2021" },
+                { "@id": "https://msearch.example/entity/dock", "@type": "Organization", "name": "DOCK",
+                    "aliases": ["dock airlines"], "about": "DOCK is an airlines company.", "category": "Airlines",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/dtv", "@type": "Organization", "name": "DTV",
+                    "aliases": ["dtv channel"], "about": "DTV is a channel company.", "category": "Channel",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/eletc", "@type": "Organization", "name": "ELETc",
+                    "aliases": ["eletc company"], "about": "Eletc is a power company.", "category": "Power",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/eox", "@type": "Organization", "name": "EOX",
+                    "aliases": ["eox company"], "about": "EOX is an unknown type company.", "category": "Unknown",
+                    "created": "2023" },
+                { "@id": "https://msearch.example/entity/eco-club", "@type": "Organization", "name": "Eco Club",
+                    "aliases": ["eco team"], "about": "Eco Club is a team company.", "category": "Team",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/esm-airlines", "@type": "Organization", "name": "ESM Airlines",
+                    "aliases": ["esm airline"], "about": "ESM Airlines is an airlines company.", "category": "Airlines",
+                    "owner": "MGPLC", "created": "2022" },
+                { "@id": "https://msearch.example/entity/fc-studio", "@type": "Organization", "name": "FC Studio",
+                    "aliases": ["fc comics"], "about": "FC Studio is a comic company.", "category": "Comic",
+                    "created": "2023" },
+                { "@id": "https://msearch.example/entity/fox", "@type": "Organization", "name": "FOX",
+                    "aliases": ["fox company"], "about": "FOX is an unknown type company.", "category": "Unknown",
+                    "created": "2024" },
+                { "@id": "https://msearch.example/entity/gome", "@type": "Organization", "name": "GOME",
+                    "aliases": ["gome company"], "about": "GOME is a mobile parts company.", "category": "Mobile Parts",
+                    "created": "2024" },
+                { "@id": "https://msearch.example/entity/gk-industries", "@type": "Organization", "name": "GK Industries",
+                    "aliases": ["gk industres"], "about": "GK Industries is an oil and gas company.",
+                    "category": "Oil and Gas", "created": "2023" },
+                { "@id": "https://msearch.example/entity/post", "@type": "Organization", "name": "POST",
+                    "aliases": ["post company"], "about": "Post is a company.", "category": "Post Company",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/pxo", "@type": "Organization", "name": "PXO",
+                    "aliases": ["pxo"], "about": "PXO is a car company.", "category": "Car Company", "created": "2021" },
+                { "@id": "https://msearch.example/entity/proo", "@type": "Organization", "name": "PROO",
+                    "aliases": ["proo"], "about": "PROO is a car company.", "category": "Car Company",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/rc", "@type": "Organization", "name": "RC", "aliases": ["rc"],
+                    "about": "RC is a car company.", "category": "Car Company", "created": "2020" },
+                { "@id": "https://msearch.example/entity/rvo", "@type": "Organization", "name": "RVO",
+                    "aliases": ["rvo"], "about": "RVO is a bike company.", "category": "Bike Company",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/rock-sten", "@type": "Organization", "name": "Rock STEN",
+                    "aliases": ["rock sten"], "about": "Rock STEN is a soda company.", "category": "Soda Company",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/rab", "@type": "Organization", "name": "RAB",
+                    "aliases": ["rab"], "about": "RAB is a company.", "category": "Unknown", "created": "2023" },
+                { "@id": "https://msearch.example/entity/std-soda", "@type": "Organization", "name": "STD Soda",
+                    "aliases": ["std soda"], "about": "STD Soda is a soda company.", "category": "Soda Company",
+                    "created": "2024" },
+                { "@id": "https://msearch.example/entity/ssb", "@type": "BankOrCreditUnion", "name": "SSB",
+                    "aliases": ["ssb"], "full_name": "STATE SO BANK",
+                    "about": "SSB is a banking company.", "category": "Banking Company", "created": "2022" },
+                { "@id": "https://msearch.example/entity/super-m", "@type": "Organization", "name": "SUPER M",
+                    "aliases": ["super m"], "about": "SUPER M is a shopping company.", "category": "Shopping Company",
+                    "created": "2022" },
+                { "@id": "https://msearch.example/entity/sory", "@type": "Organization", "name": "SORY",
+                    "aliases": ["sory"], "about": "SORY is a shopping company.", "category": "Shopping Company",
+                    "created": "2022" },
+                { "@id": "https://msearch.example/entity/snow", "@type": "Organization", "name": "SNOW",
+                    "aliases": ["snow"], "about": "Snow is a company.", "category": "Unknown", "created": "2021" },
+                { "@id": "https://msearch.example/entity/ster", "@type": "Organization", "name": "STER",
+                    "aliases": ["ster"], "about": "STER is a company.", "category": "Unknown", "created": "2023" },
+                { "@id": "https://msearch.example/entity/vox", "@type": "Organization", "name": "VOX",
+                    "aliases": ["vox"], "about": "VOX is a company.", "category": "Unknown", "created": "2024" },
+                { "@id": "https://msearch.example/entity/vic", "@type": "Organization", "name": "VIC",
+                    "aliases": ["vic"], "about": "VIC is a memory company.", "category": "Memory Company",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/vol", "@type": "Organization", "name": "VOL",
+                    "aliases": ["vol"], "about": "VOL is a car company.", "category": "Car Company", "created": "2021" },
+                { "@id": "https://msearch.example/entity/vit", "@type": "Organization", "name": "VIT",
+                    "aliases": ["vit"], "about": "VIT is a company.", "category": "Unknown", "created": "2022" },
+                { "@id": "https://msearch.example/entity/ws-company", "@type": "Organization", "name": "WS Company",
+                    "aliases": ["ws"], "about": "WS is a channel company.", "category": "Channel Company",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/entity/x-car", "@type": "Organization", "name": "X CAR",
+                    "aliases": ["x car"], "about": "X CAR is a car company.", "category": "Car Company",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/xot", "@type": "Organization", "name": "XOT",
+                    "aliases": ["xot"], "about": "XOT is a racing company.", "category": "Racing Company",
+                    "created": "Unknown" },
+                { "@id": "https://msearch.example/entity/xfo", "@type": "Organization", "name": "XFO",
+                    "aliases": ["xfo"], "about": "XFO is a company.", "category": "Unknown", "created": "2023" },
+                { "@id": "https://msearch.example/entity/x-news", "@type": "NewsMediaOrganization", "name": "X NEWS",
+                    "aliases": ["x news", "xnews"], "about": "X NEWS is a news company.", "category": "News Company",
+                    "created": "2021" },
+                { "@id": "https://msearch.example/entity/m-desh", "@type": "Country", "name": "M Desh",
+                    "aliases": ["mdesh"], "about": "M Desh is a country.", "capital": "MCity",
+                    "continent": "M Continent" },
+                { "@id": "https://msearch.example/entity/ron-desh", "@type": "Country", "name": "Ron Desh",
+                    "aliases": ["ron desh"], "about": "Ron Desh is a country.", "capital": "Unknown",
+                    "continent": "Ron Continent" },
+                { "@id": "https://msearch.example/entity/i-desh", "@type": "Country", "name": "I Desh",
+                    "aliases": ["i desh"], "about": "I Desh is a country.", "capital": "Unknown",
+                    "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/x-desh", "@type": "Country", "name": "X Desh",
+                    "aliases": ["x desh"], "about": "X Desh is a country.", "capital": "Unknown",
+                    "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/e", "@type": "Country", "name": "E", "aliases": ["e"],
+                    "about": "E is a country.", "capital": "Unknown", "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/kot", "@type": "Country", "name": "Kot",
+                    "aliases": ["kot"], "about": "Kot is a country.", "capital": "Unknown",
+                    "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/bc", "@type": "Country", "name": "BC", "aliases": ["bc"],
+                    "about": "BC is a country.", "capital": "Unknown", "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/p-desh", "@type": "Country", "name": "P Desh",
+                    "aliases": ["p desh"], "about": "P Desh is a country.", "capital": "Unknown",
+                    "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/snm", "@type": "Country", "name": "SNM",
+                    "aliases": ["snm"], "about": "SNM is a country.", "capital": "Unknown",
+                    "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/olo", "@type": "Country", "name": "OLO",
+                    "aliases": ["olo"], "about": "OLO is a country.", "capital": "Unknown",
+                    "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/anasa", "@type": "Country", "name": "Anasa",
+                    "aliases": ["anasa"], "about": "Anasa is a country.", "capital": "Unknown",
+                    "continent": "EA Continent" },
+                { "@id": "https://msearch.example/entity/mri", "@type": "Organization", "name": "MRI",
+                    "aliases": ["mri"], "about": "MRI is an international group.", "category": "International Group",
+                    "created": "2019", "member": "11", "leader": "M Desh, Ron Desh, I Desh", "headquarter": "M Desh" },
+                { "@id": "https://msearch.example/entity/mrc", "@type": "Organization", "name": "MRC",
+                    "aliases": ["mrc"], "about": "MRC is an international group.", "category": "International Group",
+                    "created": "2019", "member": "11", "leader": "M Desh, Ron Desh",
+                "headquarter": "EA Continent" },
+                { "@id": "https://msearch.example/entity/sos", "@type": "SoftwareApplication", "name": "SOS",
+                    "aliases": ["sos"], "full_name": "Super Of System", "about": "SOS is an app system.",
+                    "category": "App System", "created": "2024" },
+                { "@id": "https://msearch.example/entity/red-triangle-system", "@type": "SoftwareApplication",
+                    "name": "Red Triangle System", "aliases": ["red triangle"],
+                    "about": "Red Triangle is an app system.", "category": "App System", "owner": "SOS",
+                    "created": "2024" },
+                { "@id": "https://msearch.example/entity/toms", "@type": "SoftwareApplication", "name": "TOMS",
+                    "aliases": ["technology of mobile"], "about": "Technology of Mobile is a system.",
+                    "category": "Mobile Technology System", "owner": "T COMPUTER", "created": "2014" },
+                { "@id": "https://msearch.example/entity/toc", "@type": "SoftwareApplication", "name": "TOC",
+                    "aliases": ["technology of company"], "about": "Technology of Company is a system.",
+                    "category": "Company System", "owner": "T COMPUTER", "created": "2021" },
+                { "@id": "https://msearch.example/entity/tos", "@type": "SoftwareApplication", "name": "TOS",
+                    "aliases": ["technology of system"], "about": "Technology of System is a build system.",
+                    "category": "Build System", "owner": "T COMPUTER", "created": "2021" },
+                { "@id": "https://msearch.example/entity/greenai", "@type": "SoftwareApplication", "name": "GREENAI",
+                    "aliases": ["greenai"], "about": "GREENAI is a data system.", "category": "Data System",
+                    "owner": "ICWRA", "created": "2024" },
+                { "@id": "https://msearch.example/entity/msi", "@type": "SoftwareApplication", "name": "MSI",
+                    "aliases": ["msi"], "about": "MSI is a data system.", "category": "Data System",
+                    "owner": "M Search", "created": "2025" },
+                { "@id": "https://msearch.example/entity/csvs", "@type": "SoftwareApplication",
+                    "name": "Circul Spin Vote System", "aliases": ["circul spin vote system", "csvs"],
+                    "about": "Circul Spin is a voting system.", "category": "Vote System", "owner": "ECMD",
+                    "created": "2025" },
+                { "@id": "https://msearch.example/qa/python", "@type": "Question", "name": "What is Python?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Python is a programming language." } },
+                { "@id": "https://msearch.example/qa/google", "@type": "Question", "name": "What is Google?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Google is a search engine." } },
+                { "@id": "https://msearch.example/qa/computer", "@type": "Question", "name": "What is a computer?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "A computer is an electronic machine." } },
+                { "@id": "https://msearch.example/qa/miraz", "@type": "Question", "name": "What is Miraz?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Miraz is a #." } },
+                { "@id": "https://msearch.example/qa/total-app", "@type": "Question",
+                    "name": "How many total apps are there?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Total apps: 48+." } },
+                { "@id": "https://msearch.example/qa/total-continent", "@type": "Question",
+                    "name": "How many total continents are there?",
+                    "acceptedAnswer": { "@type": "Answer",
+                    "text": "There are 3 continents: M Continent, Ron Continent, and EA Continent." } }
+            ]
+        };
+
+        function typeLabel(type) {
+            const map = {
+                'SoftwareApplication': 'Software / App',
+                'MobileApplication': 'Mobile App',
+                'Corporation': 'Corporation',
+                'Organization': 'Organization',
+                'EducationalOrganization': 'Educational Org',
+                'BankOrCreditUnion': 'Bank',
+                'NewsMediaOrganization': 'News Organization',
+                'Country': 'Country',
+                'Person': 'Person',
+                'Question': 'Q&A'
+            };
+            if (Array.isArray(type)) type = type[0];
+            return map[type] || type;
+        }
+
+        function buildRowsFromEntity(e) {
+            const rows = [];
+            const skip = new Set(['@id', '@type', 'name', 'aliases', 'about', 'description', 'notes', 'hasPart']);
+            const labels = {
+                full_name: 'Full Name',
+                founder: 'Founder',
+                owner: 'Owner',
+                created: 'Created',
+                total_company: 'Total Companies',
+                network: 'Network',
+                location: 'Location',
+                capital: 'Capital',
+                continent: 'Continent',
+                member: 'Members',
+                leader: 'Leader',
+                headquarter: 'Headquarter',
+                under: 'Under',
+                full_form: 'Full Form',
+                first_game: 'First Game',
+                second_game: 'Second Game',
+                student_created: 'Students Created',
+                total_apps: 'Total Apps',
+                category: 'Category',
+                jobTitle: 'Job Title'
+            };
+            for (const [k, v] of Object.entries(e)) {
+                if (skip.has(k)) continue;
+                if (typeof v === 'object' && !Array.isArray(v)) continue;
+                const label = labels[k] || k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' ');
+                const value = Array.isArray(v) ? v.join(', ') : String(v);
+                rows.push({ label, value });
+            }
+            if (e.hasPart) rows.push({ label: 'Companies', value: e.hasPart.join(', ') });
+            return rows;
+        }
+
+        function convertJsonLdToArticles(data) {
+            const articles = [];
+            for (const entity of data['@graph']) {
+                let type = entity['@type'];
+                let id, title, subtitle, notes;
+
+                if (type === 'Question') {
+                    id = entity['@id'].split('/').pop();
+                    title = entity['name'];
+                    subtitle = 'Question & Answer';
+                    notes = entity['acceptedAnswer'] ? entity['acceptedAnswer']['text'] : '';
+                    articles.push({ id, title, subtitle, images: [], caption: '', notes, rows: [], videos: [],
+                        category: 'Q&A' });
+                    continue;
+                }
+
+                id = entity['@id'].split('/').pop();
+                title = entity['name'];
+                subtitle = typeLabel(type);
+                notes = entity['about'] || entity['description'] || '';
+                const rows = buildRowsFromEntity(entity);
+                // preserve category if present
+                const cat = entity['category'] || subtitle;
+                articles.push({ id, title, subtitle, images: [], caption: '', notes, rows, videos: [], category: cat });
+            }
+            return articles;
+        }
+
+        // Single source initialization
+        const jsonLdArticles = convertJsonLdToArticles(jsonLdData);
+
+        // Load existing manual creations from LocalStorage
+        let manualArticles = JSON.parse(localStorage.getItem('manualArticles')) || [];
+        let localDatabase = [...jsonLdArticles, ...manualArticles];
+
+        function syncStorage() {
+            localStorage.setItem('manualArticles', JSON.stringify(manualArticles));
+            // rebuild localDatabase for fresh references
+            localDatabase = [...jsonLdArticles, ...manualArticles];
+        }
+
+        let isEditStateActive = false;
+        let selectedItem = null;
+        let currentPhotoIndex = 0;
+
+        const mainSearchInput = document.getElementById('mainSearchInput');
+        const dropdownSuggestions = document.getElementById('dropdownSuggestions');
+        const searchView = document.getElementById('searchView');
+        const detailInfocardView = document.getElementById('detailInfocardView');
+        const navHeader = document.getElementById('navHeader');
+        const secretAdminBar = document.getElementById('secretAdminBar');
+        const photoUploadTrigger = document.getElementById('photoUploadTrigger');
+        const bottomActionRow = document.getElementById('bottomActionRow');
+        const deleteArticleBtn = document.getElementById('deleteArticleBtn');
+
+        mainSearchInput.addEventListener('input', function() {
+            const raw = this.value.trim();
+            const clean = raw.toLowerCase();
+
+            if (clean === 'edit') {
+                isEditStateActive = !isEditStateActive;
+                secretAdminBar.style.display = isEditStateActive ? 'flex' : 'none';
+                if (isEditStateActive && selectedItem) {
+                    photoUploadTrigger.style.display = 'block';
+                    bottomActionRow.classList.add('visible');
+                    deleteArticleBtn.style.display = 'block';
+                }
+                if (selectedItem) {
+                    renderCatSelectRow();
+                    document.getElementById('videoUploadTrigger').style.display = isEditStateActive ? 'block' : 'none';
+                    renderVideoSection();
+                }
+                alert(isEditStateActive ? " EDIT MODE ACTIVE!" : "🔒 EDIT MODE OFF");
+                this.value = '';
+                dropdownSuggestions.style.display = 'none';
+                if (selectedItem) triggerCardDisplay(selectedItem.id);
+                return;
+            }
+
+            dropdownSuggestions.innerHTML = '';
+            if (raw === '') { dropdownSuggestions.style.display = 'none'; return; }
+
+            const filtered = localDatabase.filter(d =>
+                d.title.toLowerCase().includes(clean) || d.subtitle.toLowerCase().includes(clean)
+            );
+
+            if (filtered.length > 0) {
+                filtered.forEach(data => {
+                    const div = document.createElement('div');
+                    div.className = 'box-row-item';
+                    const thumb = (data.images && data.images[0]) || '';
+                    div.innerHTML =
+                        `<img src="${thumb}" class="row-thumb-frame"><div class="row-text-meta"><h4>${data.title}</h4><p>${data.subtitle}</p></div>`;
+                    div.onclick = () => triggerCardDisplay(data.id);
+                    dropdownSuggestions.appendChild(div);
+                });
+                dropdownSuggestions.style.display = 'block';
+            } else {
+                dropdownSuggestions.style.display = 'none';
+            }
+        });
+
+        mainSearchInput.addEventListener('click', function() {
+            if (this.value.trim()) dropdownSuggestions.style.display = 'block';
+        });
+
+        function triggerCardDisplay(id) {
+            const obj = localDatabase.find(i => i.id === id);
+            if (!obj) return;
+            if (!obj.images) obj.images = [];
+            if (!obj.videos) obj.videos = [];
+
+            selectedItem = obj;
+            currentPhotoIndex = 0;
+
+            searchView.style.display = 'none';
+            navHeader.style.display = 'block';
+            detailInfocardView.style.display = 'block';
+            photoUploadTrigger.style.display = isEditStateActive ? 'block' : 'none';
+            document.getElementById('videoUploadTrigger').style.display = isEditStateActive ? 'block' : 'none';
+            deleteArticleBtn.style.display = isEditStateActive ? 'block' : 'none';
+
+            if (isEditStateActive) bottomActionRow.classList.add('visible');
+            else bottomActionRow.classList.remove('visible');
+
+            const titleEl = document.getElementById('cardTitleHolder');
+            const capEl = document.getElementById('cardCaptionHolder');
+            titleEl.innerText = obj.title;
+            titleEl.contentEditable = isEditStateActive;
+            capEl.innerText = obj.caption || '';
+            capEl.contentEditable = isEditStateActive;
+
+            renderDescriptionRow();
+            renderCarousel();
+            renderDataRows();
+            renderArticleCatBadge();
+            renderCatSelectRow();
+            renderVideoSection();
+            const hint = document.getElementById('photoDlHint');
+            if (hint) hint.classList.add('visible');
+        }
+
+        function renderDescriptionRow() {
+            const descRow = document.getElementById('descRow');
+            const descTextarea = document.getElementById('descTextarea');
+            const addDescBtn = document.getElementById('addDescBtn');
+            const hasNotes = selectedItem.notes && selectedItem.notes.trim() !== '';
+
+            descTextarea.innerText = selectedItem.notes || '';
+            descTextarea.contentEditable = isEditStateActive;
+
+            if (hasNotes) {
+                descRow.classList.add('visible');
+                if (addDescBtn) addDescBtn.style.display = 'none';
+            } else {
+                descRow.classList.remove('visible');
+                if (addDescBtn) addDescBtn.style.display = isEditStateActive ? 'inline-block' : 'none';
+            }
+        }
+
+        function toggleDescription() {
+            const descRow = document.getElementById('descRow');
+            const descTextarea = document.getElementById('descTextarea');
+            const addDescBtn = document.getElementById('addDescBtn');
+            descRow.classList.add('visible');
+            descTextarea.contentEditable = 'true';
+            descTextarea.focus();
+            if (addDescBtn) addDescBtn.style.display = 'none';
+        }
+
+        function renderCarousel() {
+            if (!selectedItem) return;
+            const imgs = selectedItem.images || [];
+            const imgEl = document.getElementById('cardImageHolder');
+            const dotsEl = document.getElementById('carouselDots');
+            const arrowL = document.getElementById('arrowLeft');
+            const arrowR = document.getElementById('arrowRight');
+
+            if (currentPhotoIndex >= imgs.length) currentPhotoIndex = Math.max(0, imgs.length - 1);
+            imgEl.src = imgs.length > 0 ? imgs[currentPhotoIndex] : '';
+
+            const multi = imgs.length > 1;
+            arrowL.style.display = multi ? 'block' : 'none';
+            arrowR.style.display = multi ? 'block' : 'none';
+
+            dotsEl.innerHTML = '';
+            imgs.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'carousel-dot' + (i === currentPhotoIndex ? ' active' : '');
+                dot.onclick = () => { currentPhotoIndex = i;
+                    renderCarousel(); };
+                dotsEl.appendChild(dot);
+            });
+        }
+
+        function carouselMove(dir) {
+            if (!selectedItem || !selectedItem.images) return;
+            const len = selectedItem.images.length;
+            if (len <= 1) return;
+            currentPhotoIndex = (currentPhotoIndex + dir + len) % len;
+            renderCarousel();
+        }
+
+        function renderDataRows() {
+            const container = document.getElementById('cardRowsContainer');
+            container.innerHTML = '';
+            selectedItem.rows.forEach((row, index) => {
+                const el = document.createElement('div');
+                el.className = 'card-data-row';
+                el.innerHTML = `
+                    <div class="card-cell-label" contenteditable="${isEditStateActive}" onblur="updateRowValue(${index},'label',this)">${row.label}</div>
+                    <div class="card-cell-value">
+                        <span contenteditable="${isEditStateActive}" onblur="updateRowValue(${index},'value',this)">${row.value}</span>
+                        <span class="delete-row-icon" style="display:${isEditStateActive ? 'block' : 'none'}" onclick="deleteSelectedRow(${index})">✕</span>
+                    </div>`;
+                container.appendChild(el);
+            });
+        }
+
+        function updateTextData(field, el) {
+            if (selectedItem) {
+                selectedItem[field] = el.innerText;
+                if (selectedItem.id.startsWith('manual_')) {
+                    let match = manualArticles.find(i => i.id === selectedItem.id);
+                    if (match) match[field] = el.innerText;
+                }
+                syncStorage();
+            }
+        }
+
+        function updateRowValue(index, sub, el) {
+            if (selectedItem && selectedItem.rows[index]) {
+                selectedItem.rows[index][sub] = el.innerText;
+                if (selectedItem.id.startsWith('manual_')) {
+                    let match = manualArticles.find(i => i.id === selectedItem.id);
+                    if (match && match.rows[index]) match.rows[index][sub] = el.innerText;
+                }
+                syncStorage();
+            }
+        }
+
+        function addNewInfoRow() {
+            if (!selectedItem) return;
+            selectedItem.rows.push({ label: "Label", value: "Value" });
+            if (selectedItem.id.startsWith('manual_')) {
+                let match = manualArticles.find(i => i.id === selectedItem.id);
+                if (match) match.rows.push({ label: "Label", value: "Value" });
+            }
+            renderDataRows();
+            syncStorage();
+        }
+
+        function deleteSelectedRow(index) {
+            if (!selectedItem) return;
+            selectedItem.rows.splice(index, 1);
+            if (selectedItem.id.startsWith('manual_')) {
+                let match = manualArticles.find(i => i.id === selectedItem.id);
+                if (match) match.rows.splice(index, 1);
+            }
+            renderDataRows();
+            syncStorage();
+        }
+
+        function deleteCurrentArticle() {
+            if (!selectedItem) return;
+            if (confirm(`"${selectedItem.title}" delete karna chahte hain?`)) {
+                if (selectedItem.id.startsWith('manual_')) {
+                    manualArticles = manualArticles.filter(i => i.id !== selectedItem.id);
+                    syncStorage();
+                } else {
+                    alert("JSON-LD se aaye articles delete nahi ho sakte.");
+                    return;
+                }
+                resetToSearchView();
+            }
+        }
+
+        function processLocalImage(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+            if (!selectedItem) { alert("Pehle koi article open karo."); return; }
+            if (!selectedItem.images) selectedItem.images = [];
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    selectedItem.images.push(e.target.result);
+                    if (selectedItem.id.startsWith('manual_')) {
+                        let match = manualArticles.find(i => i.id === selectedItem.id);
+                        if (match) match.images = selectedItem.images;
+                    }
+                    loaded++;
+                    if (loaded === files.length) {
+                        currentPhotoIndex = selectedItem.images.length - 1;
+                        renderCarousel();
+                        syncStorage();
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
+        function openCreateModal() {
+            document.getElementById('mTitle').value = '';
+            document.getElementById('mSubtitle').value = '';
+            document.getElementById('modalRowsContainer').innerHTML = `
+                <div class="modal-row-entry">
+                    <input type="text" placeholder="Label" class="mRowLabel">
+                    <input type="text" placeholder="Value" class="mRowValue">
+                </div>`;
+            document.getElementById('createModal').classList.add('open');
+        }
+
+        function closeCreateModal() { document.getElementById('createModal').classList.remove('open'); }
+
+        function addModalRow() {
+            const rc = document.getElementById('modalRowsContainer');
+            const div = document.createElement('div');
+            div.className = 'modal-row-entry';
+            div.innerHTML =
+                `<input type="text" placeholder="Label" class="mRowLabel"><input type="text" placeholder="Value" class="mRowValue">`;
+            rc.appendChild(div);
+        }
+
+        function submitCreateArticle() {
+            const title = document.getElementById('mTitle').value.trim();
+            if (!title) { alert("Title zaroor likhein!"); return; }
+            const subtitle = document.getElementById('mSubtitle').value.trim() || "Article";
+            const labelEls = document.querySelectorAll('.mRowLabel');
+            const valueEls = document.querySelectorAll('.mRowValue');
+            const rows = [];
+            labelEls.forEach((el, i) => {
+                const l = el.value.trim(),
+                    v = valueEls[i] ? valueEls[i].value.trim() : '';
+                if (l || v) rows.push({ label: l || "Label", value: v || "" });
+            });
+            const catEl = document.getElementById('modalCatSelect');
+            const newCat = catEl ? catEl.value : '';
+            const newArticle = {
+                id: "manual_" + Date.now(),
+                title,
+                subtitle,
+                images: [],
+                caption: "",
+                notes: "",
+                category: newCat,
+                videos: [],
+                rows: rows.length ? rows : []
+            };
+
+            manualArticles.push(newArticle);
+            syncStorage();
+            closeCreateModal();
+            triggerCardDisplay(newArticle.id);
+        }
+
+        function resetToSearchView() {
+            detailInfocardView.style.display = 'none';
+            navHeader.style.display = 'none';
+            searchView.style.display = 'block';
+            dropdownSuggestions.style.display = 'none';
+            deleteArticleBtn.style.display = 'none';
+            mainSearchInput.value = '';
+            selectedItem = null;
+        }
+
+        document.addEventListener('click', e => {
+            if (!searchView.contains(e.target)) dropdownSuggestions.style.display = 'none';
+        });
+
+
+        // ====================================================
+        // CATEGORY SYSTEM
+        // ====================================================
+        const CAT_ICONS = {
+            'Education': '🎓',
+            'Sports': '⚽',
+            'Technology': '💻',
+            'Science': '🔬',
+            'History': '📜',
+            'Geography': '🌍',
+            'Arts': '🎨',
+            'Music': '🎵',
+            'Business': '💼',
+            'Politics': '🏛️',
+            'Health': '🏥',
+            'Food': '🍽️',
+            'Travel': '✈️',
+            'Entertainment': '🎬',
+            'Finance': '💰',
+            'Nature': '🌿',
+            'Religion': '🕌',
+            'Language': '📖',
+            'Military': '⚔️',
+            'Law': '⚖️',
+            'Organization': '🏢',
+            'Software / App': '📱',
+            'Corporation': '🏗️',
+            'Country': '🌐',
+            'Person': '👤',
+            'Q&A': '❓',
+            'Other': '📌',
+            'Mobile App': '📱',
+            'Educational Org': '🎓',
+            'Bank': '🏦',
+            'News Organization': '📰',
+            'Mobile Technology System': '📱',
+            'App System': '⚙️',
+            'Data System': '💾',
+            'Vote System': '🗳️',
+            'International Group': '🤝',
+            'Question & Answer': '❓',
+            'News Company': '📰',
+            'Banking': '🏦',
+            'Banking Company': '🏦',
+            'Airlines': '✈️',
+            'Oil': '🛢️',
+            'Power': '⚡',
+            'Medicine': '💊',
+            'Car': '🚗',
+            'Car Company': '🚗',
+            'Bike Company': '🏍️',
+            'Channel': '📺',
+            'Channel Company': '📺',
+            'Cement': '🧱',
+            'Shopping Company': '🛍️',
+            'Soda Company': '🥤',
+            'Comic': '📚',
+            'Racing Company': '🏎️',
+            'Memory Company': '💾',
+            'Mobile': '📱',
+            'Dress': '👗',
+            'Team': '👥',
+            'Internal': '🏠',
+            'Advertising': '📣',
+            'Group': '🏗️',
+            'Post Company': '📮',
+            'Toothpaste': '🪥',
+            'Unknown': '❓',
+            'Mobile Parts': '⚙️',
+            'Oil and Gas': '🛢️'
+        };
+
+        let activeCategoryFilter = null;
+
+        function getCategoryFromArticle(article) {
+            if (article.category) return article.category;
+            if (article.subtitle) return article.subtitle;
+            return 'Other';
+        }
+
+        function buildCategoryGrid() {
+            const catMap = {};
+            localDatabase.forEach(art => {
+                const cat = getCategoryFromArticle(art);
+                if (!cat) return;
+                if (!catMap[cat]) catMap[cat] = 0;
+                catMap[cat]++;
+            });
+
+            const sorted = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+            const grid = document.getElementById('categoryGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            sorted.forEach(([cat, count]) => {
+                const ico = CAT_ICONS[cat] || '📁';
+                const chip = document.createElement('div');
+                chip.className = 'category-chip' + (activeCategoryFilter === cat ? ' active' : '');
+                chip.innerHTML =
+                    `<span class="category-chip-ico">${ico}</span>${cat}<span class="category-chip-count">${count}</span>`;
+                chip.onclick = () => selectCategory(cat);
+                grid.appendChild(chip);
+            });
+        }
+
+        function selectCategory(cat) {
+            activeCategoryFilter = cat;
+            const ico = CAT_ICONS[cat] || '📁';
+
+            document.getElementById('catFilterBar').classList.add('visible');
+            document.getElementById('catFilterIco').textContent = ico;
+            document.getElementById('catFilterName').textContent = cat;
+
+            const filtered = localDatabase.filter(a => getCategoryFromArticle(a) === cat);
+
+            showCategoryResults(filtered, cat, ico);
+            buildCategoryGrid();
+
+            setTimeout(() => {
+                const panel = document.getElementById('catResultsPanel');
+                if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+        }
+
+        function clearCategoryFilter() {
+            activeCategoryFilter = null;
+            document.getElementById('catFilterBar').classList.remove('visible');
+            document.getElementById('catResultsPanel').classList.remove('open');
+            dropdownSuggestions.style.display = 'none';
+            buildCategoryGrid();
+        }
+
+        function showCategoryResults(articles, catName, ico) {
+            const panel = document.getElementById('catResultsPanel');
+            const list = document.getElementById('catResList');
+            const title = document.getElementById('catResTitle');
+            const count = document.getElementById('catResCount');
+            const resIco = document.getElementById('catResIco');
+
+            resIco.textContent = ico || '📁';
+            title.textContent = catName;
+            count.textContent = articles.length + ' articles';
+
+            list.innerHTML = '';
+            if (!articles.length) {
+                list.innerHTML =
+                '<div style="padding:20px;text-align:center;color:#72777d;font-size:13px;">No articles in this category</div>';
+            } else {
+                articles.forEach(data => {
+                    const div = document.createElement('div');
+                    div.className = 'cat-result-item';
+                    const thumb = (data.images && data.images[0]) || '';
+                    div.innerHTML =
+                        `<img src="${thumb}" class="cat-result-thumb"><div><div class="cat-result-title">${data.title}</div><div class="cat-result-sub">${data.subtitle || ''}</div></div>`;
+                    div.onclick = () => {
+                        panel.classList.remove('open');
+                        triggerCardDisplay(data.id);
+                    };
+                    list.appendChild(div);
+                });
+            }
+            panel.classList.add('open');
+        }
+
+        function renderArticleCatBadge() {
+            if (!selectedItem) return;
+            const cat = getCategoryFromArticle(selectedItem);
+            const ico = cat ? (CAT_ICONS[cat] || '📁') : '📁';
+            const badgeRow = document.getElementById('articleCatBadgeRow');
+            const badge = document.getElementById('articleCatBadge');
+            if (cat) {
+                badge.innerHTML = `${ico} ${cat}`;
+                badgeRow.style.display = 'block';
+            } else {
+                badgeRow.style.display = 'none';
+            }
+            const sel = document.getElementById('catSelectEl');
+            if (sel) sel.value = cat || '';
+        }
+
+        function setCategoryFromSelect(val) {
+            if (!selectedItem) return;
+            selectedItem.category = val;
+            if (selectedItem.id.startsWith('manual_')) {
+                const m = manualArticles.find(i => i.id === selectedItem.id);
+                if (m) m.category = val;
+                syncStorage();
+            }
+            renderArticleCatBadge();
+            buildCategoryGrid();
+        }
+
+        function renderCatSelectRow() {
+            const row = document.getElementById('catSelectRow');
+            if (!row) return;
+            if (isEditStateActive) row.classList.add('visible');
+            else row.classList.remove('visible');
+        }
+
+        // ====================================================
+        // VIDEO SUPPORT
+        // ====================================================
+        function processLocalVideo(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+            if (!selectedItem) { alert("Pehle koi article open karo."); return; }
+            if (!selectedItem.videos) selectedItem.videos = [];
+
+            let loaded = 0;
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    selectedItem.videos.push({ src: e.target.result, name: file.name });
+                    if (selectedItem.id.startsWith('manual_')) {
+                        const m = manualArticles.find(i => i.id === selectedItem.id);
+                        if (m) m.videos = selectedItem.videos;
+                        syncStorage();
+                    }
+                    loaded++;
+                    if (loaded === files.length) renderVideoSection();
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
+        function renderVideoSection() {
+            if (!selectedItem) return;
+            const vids = selectedItem.videos || [];
+            const section = document.getElementById('videoSection');
+            const label = document.getElementById('videoSectionLabel');
+
+            if (!vids.length && !isEditStateActive) {
+                section.innerHTML = '';
+                if (label) label.classList.remove('visible');
+                return;
+            }
+            if (label) label.classList.toggle('visible', vids.length > 0);
+
+            section.innerHTML = vids.map((v, i) => `
+                    <div class="video-item" id="vi-${i}">
+                        <video id="vid-${i}" src="${v.src}" preload="metadata"
+                            oncontextmenu="return false"
+                        ></video>
+                        <div class="video-overlay" id="vov-${i}" onclick="toggleVideo(${i})">
+                            <div class="video-play-btn" id="vpb-${i}">▶</div>
+                        </div>
+                        <div class="video-item-label">
+                            <span>🎥 ${v.name || 'Video ' + (i+1)}</span>
+                            <button class="video-dl-btn" onclick="downloadVideo(${i})">⬇ Download</button>
+                        </div>
+                        ${isEditStateActive ? `<div style="padding:4px 10px 8px;background:#111;"><button onclick="deleteVideo(${i})" style="background:none;border:1px solid #d33;color:#f66;font-size:11px;padding:2px 8px;border-radius:3px;cursor:pointer;">🗑 Remove</button></div>` : ''}
+                    </div>`).join('');
+        }
+
+        function toggleVideo(i) {
+            const vid = document.getElementById('vid-' + i);
+            const ov = document.getElementById('vov-' + i);
+            const pb = document.getElementById('vpb-' + i);
+            if (!vid) return;
+            if (vid.paused) {
+                vid.play();
+                ov.classList.add('playing');
+                pb.textContent = '⏸';
+            } else {
+                vid.pause();
+                ov.classList.remove('playing');
+                pb.textContent = '▶';
+            }
+            vid.onended = () => { ov.classList.remove('playing');
+                pb.textContent = '▶'; };
+        }
+
+        function downloadVideo(i) {
+            if (!selectedItem || !selectedItem.videos) return;
+            const v = selectedItem.videos[i];
+            if (!v) return;
+            const a = document.createElement('a');
+            a.href = v.src;
+            a.download = v.name || ('video_' + i + '.mp4');
+            a.click();
+        }
+
+        function deleteVideo(i) {
+            if (!selectedItem || !selectedItem.videos) return;
+            selectedItem.videos.splice(i, 1);
+            if (selectedItem.id.startsWith('manual_')) {
+                const m = manualArticles.find(a => a.id === selectedItem.id);
+                if (m) m.videos = selectedItem.videos;
+                syncStorage();
+            }
+            renderVideoSection();
+        }
+
+        // ====================================================
+        // PHOTO LONG-PRESS DOWNLOAD
+        // ====================================================
+        function enablePhotoLongPress() {
+            const imgEl = document.getElementById('cardImageHolder');
+            if (!imgEl) return;
+            let pressTimer;
+            imgEl.addEventListener('touchstart', () => {
+                pressTimer = setTimeout(() => downloadCurrentPhoto(), 700);
+            }, { passive: true });
+            imgEl.addEventListener('touchend', () => clearTimeout(pressTimer));
+            imgEl.addEventListener('touchmove', () => clearTimeout(pressTimer));
+            imgEl.addEventListener('contextmenu', e => { e.preventDefault();
+                downloadCurrentPhoto(); });
+        }
+
+        function downloadCurrentPhoto() {
+            if (!selectedItem || !selectedItem.images || !selectedItem.images.length) return;
+            const src = selectedItem.images[currentPhotoIndex];
+            if (!src) return;
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = (selectedItem.title || 'photo') + '_' + (currentPhotoIndex + 1) + '.jpg';
+            a.click();
+        }
+
+        // Init
+        buildCategoryGrid();
+        enablePhotoLongPress();
+    </script>
+</body>
+</html>
