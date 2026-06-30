@@ -1,0 +1,353 @@
+<html>
+        <head><title>Downloaded HTML</title></head>
+        <body>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Personal Internet</title>
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --panel: #1e1e1e;
+            --accent: #1a73e8;
+            --text: #ffffff;
+            --border: #333;
+            --success: #2ecc71;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 40px;
+            letter-spacing: 5px;
+            margin-bottom: 25px;
+            font-weight: 300;
+            color: var(--text);
+        }
+
+        /* Multiple File Upload Section */
+        .upload-zone {
+            background: var(--panel);
+            border: 2px dashed var(--border);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .upload-zone p {
+            margin: 0 0 12px 0;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .upload-btn {
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .upload-btn:hover {
+            background: #155cb4;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 15px;
+            text-align: left;
+            max-height: 120px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 5px 10px;
+        }
+
+        .file-item {
+            font-size: 13px;
+            color: var(--success);
+            padding: 4px 0;
+            border-bottom: 1px solid #222;
+        }
+        .file-item:last-child { border-bottom: none; }
+
+        /* Search Section */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            display: flex;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 12px 25px;
+            align-items: center;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(26, 115, 232, 0.2);
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 18px;
+        }
+
+        .search-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--accent);
+            font-size: 18px;
+            font-weight: bold;
+            padding-left: 10px;
+        }
+
+        /* Combined Results Output */
+        #results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .platform-card {
+            background: var(--panel);
+            border-radius: 15px;
+            padding: 22px;
+            border-left: 5px solid var(--accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .platform-title {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .entity-title {
+            font-size: 22px;
+            color: var(--text);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .property-row {
+            margin: 6px 0;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .property-label {
+            color: var(--accent);
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        .property-value {
+            color: #ccc;
+        }
+
+        .no-data {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">INTERNET</div>
+
+        <div class="upload-zone">
+            <p>Upload your programs here (Select multiple files like searchx.html, Copedia.html...)</p>
+            <label class="upload-btn" for="file-input">Select HTML Files</label>
+            <input type="file" id="file-input" accept=".html" multiple onchange="handleMultipleFiles(event)">
+            <div class="file-list" id="loaded-files-summary" style="display: none;"></div>
+        </div>
+
+        <div class="search-wrapper">
+            <div class="search-bar">
+                <input type="text" id="search-query" placeholder="Type keyword to search across all engines..." autocomplete="off">
+                <button class="search-btn" onclick="executeSearch()">Search</button>
+            </div>
+        </div>
+
+        <div id="results-container"></div>
+    </div>
+
+    <script>
+        // Array to dynamically hold databases extracted from all uploaded platforms
+        let aggregatedDatabases = [];
+
+        // 1. Function to process multiple HTML files at once
+        function handleMultipleFiles(event) {
+            const files = event.target.files;
+            const summaryDiv = document.getElementById("loaded-files-summary");
+            
+            if (files.length === 0) return;
+            
+            summaryDiv.innerHTML = "";
+            summaryDiv.style.display = "block";
+            
+            // Loop through each uploaded file
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const fileContent = e.target.value || e.target.result;
+                    
+                    // Regex to extract the internal 'smartData' object from the uploaded code
+                    const regex = /const\s+smartData\s*=\s*(\{[\s\S]*?\});/;
+                    const match = fileContent.match(regex);
+                    
+                    if (match && match[1]) {
+                        try {
+                            // Safely convert string to Javascript Object
+                            const parsedData = eval("(" + match[1] + ")");
+                            
+                            if (parsedData && parsedData.entities) {
+                                // Save database along with source file name
+                                aggregatedDatabases.push({
+                                    sourceName: file.name.toUpperCase().replace(".HTML", ""),
+                                    entities: parsedData.entities
+                                });
+                                
+                                // Show success badge
+                                const item = document.createElement("div");
+                                item.className = "file-item";
+                                item.innerHTML = `✓ Loaded Platform: <b>${file.name}</b>`;
+                                summaryDiv.appendChild(item);
+                            }
+                        } catch (err) {
+                            console.error("Error reading smartData in: " + file.name, err);
+                        }
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // 2. Search Processing Engine
+        function executeSearch() {
+            const query = document.getElementById("search-query").value.toLowerCase().trim();
+            const container = document.getElementById("results-container");
+            
+            container.innerHTML = ""; // Clear screen
+
+            if (query === "") {
+                container.innerHTML = "<p class='no-data'>Please enter a word to search.</p>";
+                return;
+            }
+
+            if (aggregatedDatabases.length === 0) {
+                container.innerHTML = "<p class='no-data'>No platforms uploaded yet. Please select your system files first.</p>";
+                return;
+            }
+
+            let foundMatchGlobal = false;
+
+            // 3. Scan each loaded platform database one-by-one (Displays Line by Line)
+            aggregatedDatabases.forEach(platform => {
+                let entityData = null;
+                let matchedKey = "";
+
+                // Look for direct key match or within aliases matching your systems
+                for (let key in platform.entities) {
+                    if (key === query) {
+                        entityData = platform.entities[key];
+                        matchedKey = key;
+                        break;
+                    }
+                    if (platform.entities[key].aliases && platform.entities[key].aliases.includes(query)) {
+                        entityData = platform.entities[key];
+                        matchedKey = key;
+                        break;
+                    }
+                }
+
+                // If platform has a summary for that word, render it instantly
+                if (entityData && entityData.properties) {
+                    foundMatchGlobal = true;
+
+                    const card = document.createElement("div");
+                    card.className = "platform-card";
+
+                    let propertiesHTML = "";
+                    for (let prop in entityData.properties) {
+                        propertiesHTML += `
+                            <div class="property-row">
+                                <span class="property-label">${prop}:</span> 
+                                <span class="property-value">${entityData.properties[prop]}</span>
+                            </div>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        <div class="platform-title">Source: ${platform.sourceName}</div>
+                        <div class="entity-title">${matchedKey.toUpperCase()}</div>
+                        <div class="properties-box">${propertiesHTML}</div>
+                    `;
+
+                    container.appendChild(card);
+                }
+            });
+
+            if (!foundMatchGlobal) {
+                container.innerHTML = "<p class='no-data'>No data found for this word across any uploaded platform.</p>";
+            }
+        }
+
+        // Trigger search on Enter key press
+        document.getElementById("search-query").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                executeSearch();
+            }
+        });
+    </script>
+</body>
+</html>
+</pre>
+        </body>
+    </html>
