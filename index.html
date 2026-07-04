@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Personal Internet Engine</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; }
+        body { background-color: #ffffff; color: #202124; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* --- CONTROL BAR --- */
+        .top-bar {
+            width: 100%; display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 24px; border-bottom: 1px solid #e8eaed; background: #ffffff; flex-shrink: 0;
+        }
+        .internet-title { font-size: 18px; font-weight: 500; color: #1a73e8; letter-spacing: 0.3px; }
+        .internet-title span { font-weight: 300; color: #5f6368; }
+        .btn-add-file {
+            background-color: #1a73e8; color: white; border: none; padding: 8px 20px;
+            font-size: 14px; font-weight: 500; border-radius: 24px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12); transition: background 0.2s;
+        }
+        .btn-add-file:hover { background-color: #1558b0; }
+
+        /* --- HOMEPAGE UI --- */
+        .search-engine-box {
+            flex: 1; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; justify-content: center;
+        }
+        .search-engine-box.has-results { justify-content: flex-start; padding-top: 20px; }
+        
+        .main-logo { font-size: 64px; font-weight: 500; margin-bottom: 25px; letter-spacing: -3px; }
+        .main-logo span:nth-child(1) { color: #4285f4; }
+        .main-logo span:nth-child(2) { color: #ea4335; }
+        .main-logo span:nth-child(3) { color: #fbbc05; }
+        .main-logo span:nth-child(4) { color: #4285f4; }
+        .main-logo span:nth-child(5) { color: #34a853; }
+        .main-logo span:nth-child(6) { color: #ea4335; }
+
+        .search-container { width: 100%; max-width: 600px; }
+        .search-pill {
+            display: flex; align-items: center; background: #fff; border: 1px solid #dfe1e5;
+            border-radius: 40px; padding: 0 18px; box-shadow: 0 1px 6px rgba(32,33,36,0.12); height: 52px;
+        }
+        .search-pill input { flex: 1; border: none; outline: none; font-size: 16px; padding: 12px 6px; }
+
+        /* --- SEARCH RESULTS --- */
+        .results-container { width: 100%; max-width: 652px; margin-top: 30px; display: none; flex-direction: column; gap: 24px; }
+        .results-container.visible { display: flex; }
+        
+        .google-box-result { padding: 2px 0; text-align: left; }
+        .result-site-name { font-size: 14px; color: #202124; margin-bottom: 2px; font-weight: 400; }
+        .result-url { font-size: 12px; color: #4d5156; margin-bottom: 4px; }
+        .result-title { font-size: 20px; color: #1a0dab; cursor: pointer; text-decoration: none; display: inline-block; font-weight: 400; }
+        .result-title:hover { text-decoration: underline; }
+        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.58; margin-top: 4px; word-wrap: break-word; }
+
+        /* --- POPUP MODAL --- */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(2px); }
+        .modal.open { display: flex; }
+        .modal-content { background: white; padding: 32px 28px; border-radius: 24px; width: 92%; max-width: 440px; box-shadow: 0 24px 48px rgba(0,0,0,0.3); }
+        .modal-content h3 { margin-bottom: 18px; font-size: 22px; font-weight: 400; }
+        .input-group { margin-bottom: 18px; text-align: left; }
+        .input-group label { display: block; font-size: 13px; font-weight: 500; color: #5f6368; margin-bottom: 6px; }
+        .input-group input { width: 100%; padding: 10px 14px; border: 1px solid #dadce0; border-radius: 8px; font-size: 14px; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-buttons button { padding: 8px 24px; border-radius: 24px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; }
+        .btn-cancel { background: #f1f3f4; color: #3c4043; }
+        .btn-save { background: #1a73e8; color: white; }
+
+        /* --- VIRTUAL BROWSER SCREEN --- */
+        .virtual-browser { display: none; position: fixed; inset: 0; background: white; z-index: 1000; flex-direction: column; }
+        .virtual-browser.open { display: flex; }
+        .browser-bar { background: #f1f3f4; padding: 10px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #dadce0; }
+        .btn-back { background: #1a73e8; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .browser-url { background: white; padding: 6px 14px; flex: 1; border-radius: 20px; border: 1px solid #dadce0; font-size: 13px; color: #5f6368; }
+        .browser-content { flex: 1; padding: 30px; overflow-y: auto; text-align: left; background: #fff; }
+
+        /* ARTICLE LAYOUT */
+        .wiki-title { font-size: 32px; font-weight: 400; margin-bottom: 8px; border-bottom: 1px solid #a2a9b1; padding-bottom: 5px; text-transform: uppercase; }
+        .wiki-subtitle { font-size: 16px; font-style: italic; color: #54595d; margin-bottom: 20px; }
+        .copedia-card { border: 1px solid #a2a9b1; border-radius: 4px; margin-bottom: 20px; overflow: hidden; background: #fff; max-width: 650px; }
+        .copedia-card-header { color: #fff; padding: 8px 12px; font-weight: bold; font-size: 15px; }
+        .copedia-card-body { padding: 12px; }
+        .copedia-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 14px; }
+        .copedia-table td { padding: 6px; border-bottom: 1px solid #f0f0f0; }
+        .copedia-table td:first-child { font-weight: bold; color: #555; width: 35%; }
+        .copedia-desc { font-size: 14px; line-height: 1.5; color: #202124; background: #f8f9fa; padding: 10px; border-radius: 4px; border-left: 3px solid #3366cc; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar" id="topControlBar">
+        <div class="internet-title">Google <span>Personal Internet</span></div>
+        <button class="btn-add-file" onclick="toggleModal(true)">Add Website File</button>
+    </div>
+
+    <div class="search-engine-box" id="mainHomepageEngine">
+        <div class="main-logo" id="engineLogo">
+            <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+        </div>
+        <div class="search-container">
+            <div class="search-pill">
+                <input type="text" id="mainSearchInput" placeholder="सर्च करें..." autocomplete="off">
+            </div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div id="resultsLoopRenderArea"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <h3>नयी वेबसाइट फ़ाइल जोड़ें</h3>
+            <div class="input-group">
+                <label>वेबसाइट का नाम (जैसे: Copedia, SearchX)</label>
+                <input type="text" id="platformName" placeholder="जैसे: Copedia">
+            </div>
+            <div class="input-group">
+                <label>HTML डेटाबेस फ़ाइल चुनें</label>
+                <input type="file" id="fileInput" accept=".html">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="toggleModal(false)">Cancel</button>
+                <button class="btn-save" onclick="processAndStoreDatabase()">Add Website</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="virtual-browser" id="virtualBrowser">
+        <div class="browser-bar">
+            <button class="btn-back" onclick="exitVirtualBrowser()">← Back to Search</button>
+            <div class="browser-url" id="browserUrlField">http://</div>
+        </div>
+        <div class="browser-content" id="browserWebArea"></div>
+    </div>
+
+<script>
+    let globalInternetRegistry = [];
+
+    function toggleModal(show) {
+        const modal = document.getElementById('uploadModal');
+        if (show) modal.classList.add('open');
+        else {
+            modal.classList.remove('open');
+            document.getElementById('platformName').value = '';
+            document.getElementById('fileInput').value = '';
+        }
+    }
+
+    // 🌟 सुपर फिक्स पार्सर (सभी एरर को रोकने के लिए)
+    function comprehensiveDataExtractor(text) {
+        let compiledEntities = {};
+        
+        // सुरक्षित रूप से smartData ऑब्जेक्ट को टेक्स्ट से ढूंढकर निकालने की कोशिश
+        try {
+            let jsonMatch = text.match(/smartData\s*=\s*(\{[\s\S]*?\});/m);
+            let extractedObj = null;
+
+            if (jsonMatch) {
+                // डायरेक्ट इवैल्यूएशन विदाउट एरर
+                extractedObj = new Function(`return ${jsonMatch[1]}`)();
+            } else {
+                // दूसरा फॉलबैक: स्क्रिप्ट टैग के अंदर ढूंढना
+                let scriptMatch = text.match(/smartData\s*=([\s\S]*?);/);
+                if (scriptMatch) {
+                    extractedObj = new Function(`return ${scriptMatch[1]}`)();
+                }
+            }
+
+            if (extractedObj) {
+                if (extractedObj.entities) {
+                    Object.assign(compiledEntities, extractedObj.entities);
+                }
+                if (extractedObj.manualArticles && Array.isArray(extractedObj.manualArticles)) {
+                    extractedObj.manualArticles.forEach(item => { if (item && item.id) compiledEntities[item.id] = item; });
+                }
+                if (extractedObj.editedJsonLdArticles && Array.isArray(extractedObj.editedJsonLdArticles)) {
+                    extractedObj.editedJsonLdArticles.forEach(item => { if (item && item.id) compiledEntities[item.id] = item; });
+                }
+                if (extractedObj.jsonLdData && extractedObj.jsonLdData["@graph"] && Array.isArray(extractedObj.jsonLdData["@graph"])) {
+                    extractedObj.jsonLdData["@graph"].forEach(item => {
+                        let id = item.id || item.title || (item.name ? String(item.name).toLowerCase() : null);
+                        if (id) {
+                            compiledEntities[id] = Object.assign({
+                                title: item.title || item.name,
+                                subtitle: item.description || item.subtitle || "",
+                                cards: item.cards || []
+                            }, item);
+                        }
+                    });
+                }
+                // अगर डायरेक्ट ऑब्जेक्ट ही डेटाबेस है
+                if (Object.keys(compiledEntities).length === 0) {
+                    Object.assign(compiledEntities, extractedObj);
+                }
+            }
+        } catch (e) {
+            console.error("Parsing failed inside block", e);
+        }
+        return compiledEntities;
+    }
+
+    function processAndStoreDatabase() {
+        const name = document.getElementById('platformName').value.trim();
+        const fileInput = document.getElementById('fileInput');
+
+        if (!name || fileInput.files.length === 0) {
+            alert("कृपया नाम दर्ज करें और फ़ाइल सिलेक्ट करें!");
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const rawText = e.target.result;
+            const parsedEntities = comprehensiveDataExtractor(rawText);
+
+            if (!parsedEntities || Object.keys(parsedEntities).length === 0) {
+                alert("एरर: फ़ाइल का स्मार्ट डेटा पार्स नहीं हो सका। कृपया सही फ़ाइल चुनें।");
+                return;
+            }
+
+            globalInternetRegistry.push({
+                sitePlatformName: name,
+                domainName: `https://www.${name.toLowerCase().replace(/\s+/g, '')}.org`,
+                database: parsedEntities
+            });
+
+            alert(`✅ "${name}" सफलतापूर्वक जुड़ गई! कुल ${Object.keys(parsedEntities).length} एंटिटीज मिलीं।`);
+            toggleModal(false);
+            executeLiveSearchEngine(document.getElementById('mainSearchInput').value.trim());
+        };
+        reader.readAsText(file);
+    }
+
+    // --- LIVE SEARCH CRAWLER LOOP ---
+    const mainSearchInput = document.getElementById('mainSearchInput');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultsLoopRenderArea = document.getElementById('resultsLoopRenderArea');
+    const mainHomepageEngine = document.getElementById('mainHomepageEngine');
+    const engineLogo = document.getElementById('engineLogo');
+
+    mainSearchInput.addEventListener('input', function() {
+        executeLiveSearchEngine(this.value.trim());
+    });
+
+    function executeLiveSearchEngine(queryStr) {
+        resultsLoopRenderArea.innerHTML = '';
+        const query = queryStr.toLowerCase().trim();
+
+        if (!query) {
+            resultsContainer.classList.remove('visible');
+            mainHomepageEngine.classList.remove('has-results');
+            engineLogo.style.display = 'block';
+            return;
+        }
+
+        let totalMatches = 0;
+
+        globalInternetRegistry.forEach((site, siteRegistryIndex) => {
+            for (const [key, cardData] of Object.entries(site.database)) {
+                if (key === 'title' || key === 'description' || !cardData) continue;
+
+                let itemTitle = cardData.title || key;
+                let itemDesc = "जानकारी ऑफलाइन देखने के लिए इस लिंक पर क्लिक करें।";
+
+                // कीज को ऑटो-मैप करना
+                if (cardData.subtitle && String(cardData.subtitle).trim() !== "") itemDesc = cardData.subtitle;
+                else if (cardData.notes && String(cardData.notes).trim() !== "") itemDesc = cardData.notes;
+                else if (cardData.about && String(cardData.about).trim() !== "") itemDesc = cardData.about;
+                else if (cardData.cards && Array.isArray(cardData.cards)) {
+                    let descObj = cardData.cards.find(c => c.desc && String(c.desc).trim() !== "");
+                    if (descObj) itemDesc = descObj.desc;
+                }
+
+                // बिल्कुल गूगल की तरह 155 करैक्टर्स पर शॉर्ट डिस्क्रिप्शन ट्रिम (Clamp) करना
+                if (itemDesc.length > 155) itemDesc = itemDesc.substring(0, 152) + "...";
+
+                if (key.toLowerCase().includes(query) || itemTitle.toLowerCase().includes(query) || itemDesc.toLowerCase().includes(query)) {
+                    totalMatches++;
+
+                    const resultBox = document.createElement('div');
+                    resultBox.className = 'google-box-result';
+                    resultBox.innerHTML = `
+                        <div class="result-site-name">${site.sitePlatformName}</div>
+                        <div class="result-url">${site.domainName} › ${key.replace(/\s+/g, '')}</div>
+                        <div class="result-title" onclick="launchVirtualBrowserView(${siteRegistryIndex}, '${key}')">${itemTitle.toUpperCase()}</div>
+                        <div class="result-snippet">${itemDesc}</div>
+                    `;
+                    resultsLoopRenderArea.appendChild(resultBox);
+                }
+            }
+        });
+
+        engineLogo.style.display = 'none';
+        mainHomepageEngine.classList.add('has-results');
+        resultsContainer.classList.add('visible');
+
+        if (totalMatches === 0) {
+            resultsLoopRenderArea.innerHTML = `<p style="color:#70757a; font-size:14px; padding:15px 0;">कोई परिणाम नहीं मिला।</p>`;
+        }
+    }
+
+    // --- VIRTUAL BROWSER PAGE RENDERER ---
+    function launchVirtualBrowserView(siteRegistryIndex, entityKey) {
+        const site = globalInternetRegistry[siteRegistryIndex];
+        const record = site.database[entityKey];
+
+        document.getElementById('browserUrlField').innerText = `${site.domainName}/${entityKey}`;
+        let finalHTML = `<h1 class="wiki-title">${record.title || entityKey}</h1>`;
+
+        if (record.subtitle || record.notes) {
+            finalHTML += `<div class="wiki-subtitle">${record.subtitle || record.notes}</div>`;
+        }
+
+        if (record.cards && Array.isArray(record.cards)) {
+            record.cards.forEach(card => {
+                let tableRows = "";
+                if (card.fields) {
+                    for (const [fKey, fVal] of Object.entries(card.fields)) {
+                        tableRows += `<tr><td>${fKey.toUpperCase()}</td><td>${fVal}</td></tr>`;
+                    }
+                }
+                finalHTML += `
+                    <div class="copedia-card">
+                        <div class="copedia-card-header" style="background: ${card.color || '#3366cc'}">${card.title || 'Information Specs'}</div>
+                        <div class="copedia-card-body">
+                            ${tableRows ? `<table class="copedia-table">${tableRows}</table>` : ''}
+                            ${card.desc ? `<div class="copedia-desc">${card.desc}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            let propertiesObj = record.properties || {};
+            let tableRowsHtml = '';
+            for (const [k, v] of Object.entries(propertiesObj)) {
+                tableRowsHtml += `<tr><td style="font-weight:bold; color:#1a73e8; width:40%;">${k.toUpperCase()}</td><td>${v}</td></tr>`;
+            }
+            finalHTML += `
+                <div style="float: right; width: 280px; background: #f8f9fa; border: 1px solid #a2a9b1; margin-left: 20px; padding: 12px; font-size: 13px;">
+                    <h3 style="text-align: center; background: #eaecf0; padding: 5px; margin-bottom: 8px;">INFOBOX</h3>
+                    <table style="width:100%; border-collapse:collapse;">${tableRowsHtml || '<tr><td>No properties.</td></tr>'}</table>
+                </div>
+                <div style="font-size: 16px; line-height: 1.6; color: #202124; margin-bottom: 20px;">${record.about || 'No full description summary available.'}</div>
+            `;
+        }
+
+        document.getElementById('browserWebArea').innerHTML = finalHTML;
+        document.getElementById('topControlBar').style.display = 'none';
+        document.getElementById('mainHomepageEngine').style.display = 'none';
+        document.getElementById('virtualBrowser').classList.add('open');
+        window.scrollTo(0,0);
+    }
+
+    function exitVirtualBrowser() {
+        document.getElementById('virtualBrowser').classList.remove('open');
+        document.getElementById('topControlBar').style.display = 'flex';
+        document.getElementById('mainHomepageEngine').style.display = 'flex';
+    }
+</script>
+</body>
+</html>
