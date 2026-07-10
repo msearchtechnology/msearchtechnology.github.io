@@ -160,27 +160,15 @@
         }
     </style>
 </head>
-<body class="flex justify-center items-center min-h-screen bg-neutral-950">
+    <meta name="apple-mobile-web-app-title" content="iFriend">
+    <meta name="application-name" content="iFriend">
+    <meta name="theme-color" content="#000000">
 
-    <div class="phone-container relative overflow-hidden flex flex-col border border-neutral-900 rounded-[32px] shadow-2xl">
-        
-        <!-- WELCOME SCREEN -->
-        <div id="screen-welcome" class="screen active p-6 text-center justify-between">
-            <div class="flex flex-col items-center mt-24">
-                <div class="unique-i-logo">
-                    <!-- SINGLE 'I' LETTER LOGO MADE THICKER (BOLD) AS REQUESTED -->
-                    <svg width="28" height="38" viewBox="0 0 24 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="7" y="0" width="10" height="7" rx="3.5" fill="#ffffff" />
-                        <rect x="7" y="10" width="10" height="26" rx="3.5" fill="#ffffff" />
-                    </svg>
-                </div>
-                <h1 class="text-3xl font-black text-white mt-5 tracking-tight">iFriend</h1>
-                <p class="text-xs text-neutral-500 mt-2">Social media</p>
-            </div>
-            <button onclick="switchScreen('screen-login-options')" class="w-4/5 mx-auto py-3.5 text-xs font-black text-white border border-white rounded-full hover:bg-white hover:text-black transition-all tracking-widest uppercase">GET STARTED</button>
-            <div class="text-[10px] text-neutral-600 font-bold mb-6 tracking-widest">© iFRIEND Social Media 2026</div>
-        </div>
+    <link rel="apple-touch-icon" href="https://i.imgur.com/vH1WjYl.png">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/vH1WjYl.png">
 
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogImlGcmllbmQiLAogICJzaG9ydF9uYW1lIjogImlGcmllbmQiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2kuaWd1ci5jb20vdjFXZlJZbC5wbmciLAogICAgICAic2l6ZXMiOiAiMTkyPjE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzAwMDAwMCIsCiAgInRoZW1lX2NvbG9yIjogIiMwMDAwMDAiCn0=">
+    
         <!-- LOGIN OPTIONS SCREEN -->
         <div id="screen-login-options" class="screen p-6 text-center justify-between">
             <div class="flex flex-col items-center mt-8">
