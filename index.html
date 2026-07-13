@@ -1284,77 +1284,119 @@
             return root ? root.get('data') : null;
         }
 
-        // ── load from GunDB with a timeout (3 seconds) ──
-        function loadUserData(uid) {
-            return new Promise((resolve) => {
-                const key = 'ifriend_' + uid;
-                // First, try localStorage (fast)
-                let stored = null;
-                try { stored = localStorage.getItem(key); } catch (_) {}
-                if (stored) {
-                    try {
-                        const parsed = JSON.parse(stored);
-                        appData = {
-                            posts: Array.isArray(parsed.posts) ? parsed.posts : [],
-                            friends: Array.isArray(parsed.friends) ? parsed.friends : [],
-                            profile: parsed.profile && typeof parsed.profile === 'object' ? parsed
-                            .profile : { profilePic: null, bannerPic: null }
-                        };
-                        // If we have valid data, resolve immediately, but still try to sync with GunDB in background.
-                        // We'll not wait for GunDB.
-                        // Start a background sync to keep GunDB updated.
-                        if (gun) {
-                            const node = getGunDataNode(uid);
-                            if (node) {
-                                node.put(appData).catch(() => {});
-                            }
-                        }
-                        resolve(appData);
-                        return;
-                    } catch (e) {
-                        // corrupted, continue
-                    }
-                }
+        // ================================================================
+// FIXED: LOAD USER DATA WITH INCREASED GUNDB TIMEOUT
+// ================================================================
+function loadUserData(uid) {
+    return new Promise((resolve) => {
+        const key = 'ifriend_' + uid;
+        // First, try localStorage (fast)
+        let stored = null;
+        try {
+            stored = localStorage.getItem(key);
+        } catch (_) {}
 
-                // If no localStorage, try GunDB with timeout
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                appData = {
+                    posts: Array.isArray(parsed.posts) ? parsed.posts : [],
+                    friends: Array.isArray(parsed.friends) ? parsed.friends : [],
+                    profile: parsed.profile && typeof parsed.profile === 'object' ? parsed.profile : {
+                        profilePic: null,
+                        bannerPic: null
+                    }
+                };
+                // Background sync
                 if (gun) {
                     const node = getGunDataNode(uid);
                     if (node) {
-                        let resolved = false;
-                        const timeout = setTimeout(() => {
-                            if (!resolved) {
-                                resolved = true;
-                                // Fallback to empty data
-                                appData = { posts: [], friends: [], profile: { profilePic: null,
-                                    bannerPic: null } };
-                                // Save empty to localStorage for next time
-                                try { localStorage.setItem(key, JSON.stringify(appData)); } catch (_) {}
-                                resolve(appData);
-                            }
-                        }, 3000);
-
-                        node.once(data => {
-                            if (!resolved) {
-                                resolved = true;
-                                clearTimeout(timeout);
-                                if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-                                    appData = {
-                                        posts: Array.isArray(data.posts) ? data.posts : [],
-                                        friends: Array.isArray(data.friends) ? data.friends : [],
-                                        profile: data.profile && typeof data.profile === 'object' ? data
-                                        .profile : { profilePic: null, bannerPic: null }
-                                    };
-                                } else {
-                                    appData = { posts: [], friends: [], profile: { profilePic: null,
-                                        bannerPic: null } };
-                                }
-                                try { localStorage.setItem(key, JSON.stringify(appData)); } catch (_) {}
-                                resolve(appData);
-                            }
-                        });
-                        return;
+                        node.put(appData).catch(() => {});
                     }
                 }
+                resolve(appData);
+                return;
+            } catch (e) {
+                // corrupted, continue
+            }
+        }
+
+        // If no localStorage, try GunDB with increased timeout (10 seconds)
+        if (gun) {
+            const node = getGunDataNode(uid);
+            if (node) {
+                let resolved = false;
+                const timeout = setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        // Fallback to empty data
+                        appData = {
+                            posts: [],
+                            friends: [],
+                            profile: {
+                                profilePic: null,
+                                bannerPic: null
+                            }
+                        };
+                        // Save empty to localStorage for next time
+                        try {
+                            localStorage.setItem(key, JSON.stringify(appData));
+                        } catch (_) {}
+                        resolve(appData);
+                    }
+                }, 10000); // <-- Fix: timeout increased to 10 seconds
+
+                node.once(data => {
+                    if (!resolved) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                            appData = {
+                                posts: Array.isArray(data.posts) ? data.posts : [],
+                                friends: Array.isArray(data.friends) ? data.friends : [],
+                                profile: data.profile && typeof data.profile === 'object' ? data.profile : {
+                                    profilePic: null,
+                                    bannerPic: null
+                                }
+                            };
+                            // Save to local storage for future speed
+                            try {
+                                localStorage.setItem(key, JSON.stringify(appData));
+                            } catch (_) {}
+                            resolve(appData);
+                        } else {
+                            // Empty data from Gun
+                            resolve(appData);
+                        }
+                    }
+                });
+            } else {
+                // Gun not available
+                resolve({
+                    posts: [],
+                    friends: [],
+                    profile: {
+                        profilePic: null,
+                        bannerPic: null
+                    }
+                });
+            }
+        } else {
+            // Gun not available
+            resolve({
+                posts: [],
+                friends: [],
+                profile: {
+                    profilePic: null,
+                    bannerPic: null
+                }
+            });
+        }
+    });
+        }
+        
+
+                
 
                 // No GunDB, no localStorage – empty data
                 appData = { posts: [], friends: [], profile: { profilePic: null, bannerPic: null } };
