@@ -15,21 +15,6 @@
             user-select: none;
         }
 
-        /* 3-Color Rainbow Half Circle */
-        .mst-half-circle {
-            width: 80px;
-            height: 160px;
-            /* Orange, Yellow, aur Green ka vertical stripes background */
-            background: linear-gradient(to right, 
-                #ff9900 0%, #ff9900 33.33%, 
-                #ffcc00 33.33%, #ffcc00 66.66%, 
-                #33cc33 66.66%, #33cc33 100%
-            );
-            /* Left side ko perfect round karne ke liye border-radius */
-            border-radius: 160px 0 0 160px;
-            margin-right: 2px; /* M ke sath ekdam attach rakhne ke liye */
-        }
-
         /* MST Text Style */
         .mst-text {
             font-size: 140px;
