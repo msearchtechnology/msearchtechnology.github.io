@@ -24,7 +24,6 @@ Develop By MST Devlopers
             letter-spacing: -5px; /* Aksharon ko paas lane ke liye */
         }
     </style>
-   MST Devlopers
 </head>
 <body>
 
@@ -33,6 +32,6 @@ Develop By MST Devlopers
         <div class="mst-half-circle"></div>
         <div class="mst-text">MST</div>
     </div>
-
+IFRIEND SOCIAL MEDIA 2026
 </body>
 </html>
