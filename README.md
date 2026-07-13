@@ -1,4 +1,4 @@
-
+iFRIEND Social Media 2026
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
@@ -7,8 +7,8 @@
 </head>
 <body>
 
-    <h1>MST Devlopers </h1>
-    <p>यह मेरी पहली HTML वेबसाइट है।</p>
+    <h1>IFRIEND</h1>
+    <p>Devlop by MST Devlopers</p>
 
 </body>
 </html>
