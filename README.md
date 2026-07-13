@@ -3,12 +3,12 @@ iFRIEND Social Media 2026
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>मेरी वेबसाइट</title>
+    <title></title>
 </head>
 <body>
 
     <h1>IFRIEND</h1>
-    <p>Devlop by MST Devlopers</p>
+    <p>Develop by MST Devlopers</p>
 
 </body>
 </html>
