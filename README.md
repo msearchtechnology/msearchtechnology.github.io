@@ -19,7 +19,7 @@ Develop By MST Devlopers
         .mst-text {
             font-size: 140px;
             font-weight: 900;
-            color: #800020; /* Bold Red/Burgundy Colour */
+            color: #A30022; /* Bold Red Colour */
             line-height: 1;
             letter-spacing: -5px; /* Aksharon ko paas lane ke liye */
         }
