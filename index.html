@@ -588,33 +588,112 @@ function saveGlobalPosts(arr, sync = true) {
 
 function loadUserData(uid) {
     return new Promise((resolve) => {
-        let saved = localStorage.getItem(`ifriend_${uid}`);
-        
-        const initUser = (parsedData) => {
-             if (parsedData) {
-                sessionUser = parsedData.sessionUser;
-                appData = parsedData.appData;
-            } else {
-                sessionUser = {
-                    name: currentUser.displayName,
-                    handle: currentUser.email.split('@')[0],
-                    uid: uid,
-                    profilePicData: null,
-                    bannerPicData: null,
-                    bio: "Welcome to my profile updates stream.",
-                    followingCount: 2,
-                    followersCount: 15
-                };
-                appData = {
-                    posts: [],
-                    friends: JSON.parse(localStorage.getItem('ifriend_global_users')) || []
-                };
-                saveUserData(uid, false); // Don't sync init state immediately unless needed
-            }
-            refreshAdminStatsPanel();
-            resolve();
-        };
+        const key = 'ifriend_' + uid;
+        // First, try localStorage (fast)
+        let stored = null;
+        try {
+            stored = localStorage.getItem(key);
+        } catch (_) {}
 
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                appData = {
+                    posts: Array.isArray(parsed.posts) ? parsed.posts : [],
+                    friends: Array.isArray(parsed.friends) ? parsed.friends : [],
+                    profile: parsed.profile && typeof parsed.profile === 'object' ? parsed.profile : {
+                        profilePic: null,
+                        bannerPic: null
+                    }
+                };
+                // Background sync
+                if (gun) {
+                    const node = getGunDataNode(uid);
+                    if (node) {
+                        node.put(appData).catch(() => {});
+                    }
+                }
+                resolve(appData);
+                return;
+            } catch (e) {
+                // corrupted, continue
+            }
+        }
+
+        // If no localStorage, try GunDB with increased timeout (10 seconds)
+        if (gun) {
+            const node = getGunDataNode(uid);
+            if (node) {
+                let resolved = false;
+                const timeout = setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        // Fallback to empty data
+                        appData = {
+                            posts: [],
+                            friends: [],
+                            profile: {
+                                profilePic: null,
+                                bannerPic: null
+                            }
+                        };
+                        // Save empty to localStorage for next time
+                        try {
+                            localStorage.setItem(key, JSON.stringify(appData));
+                        } catch (_) {}
+                        resolve(appData);
+                    }
+                }, 10000); // 10 seconds timeout fix
+
+                node.once(data => {
+                    if (!resolved) {
+                        resolved = true;
+                        clearTimeout(timeout);
+                        if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                            appData = {
+                                posts: Array.isArray(data.posts) ? data.posts : [],
+                                friends: Array.isArray(data.friends) ? data.friends : [],
+                                profile: data.profile && typeof data.profile === 'object' ? data.profile : {
+                                    profilePic: null,
+                                    bannerPic: null
+                                }
+                            };
+                            // Save to local storage for future speed
+                            try {
+                                localStorage.setItem(key, JSON.stringify(appData));
+                            } catch (_) {}
+                            resolve(appData);
+                        } else {
+                            // Empty data from Gun
+                            resolve(appData);
+                        }
+                    }
+                });
+            } else {
+                // Gun not available
+                resolve({
+                    posts: [],
+                    friends: [],
+                    profile: {
+                        profilePic: null,
+                        bannerPic: null
+                    }
+                });
+            }
+        } else {
+            // Gun not available
+            resolve({
+                posts: [],
+                friends: [],
+                profile: {
+                    profilePic: null,
+                    bannerPic: null
+                }
+            });
+        }
+    });
+                    }
+                          
         if (saved) {
             initUser(JSON.parse(saved));
             // In background, try to fetch newer state from GunDB
