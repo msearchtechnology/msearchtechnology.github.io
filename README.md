@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,7 @@
 </head>
 <body>
 
-    <h1>नमस्ते दुनिया (Hello World)</h1>
+    <h1>MST Devlopers </h1>
     <p>यह मेरी पहली HTML वेबसाइट है।</p>
 
 </body>
