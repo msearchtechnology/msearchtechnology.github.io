@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+Develop By MST Devlopers
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
@@ -24,6 +24,7 @@
             letter-spacing: -5px; /* Aksharon ko paas lane ke liye */
         }
     </style>
+   MST Devlopers
 </head>
 <body>
 
