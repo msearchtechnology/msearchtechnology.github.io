@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OpenCLOCK</title>
+    <style>
+        body { 
+            background-color: #000; 
+            color: #fff; 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100dvh; 
+            overflow: hidden;
+        }
+        
+        /* Header */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; z-index: 10; }
+        .menu-icon, .search-icon { width: 24px; height: 24px; stroke: #fff; cursor: pointer; fill: none; }
+
+        /* Chat Area */
+        #chat-container { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px;
+            padding-bottom: 120px; 
+        }
+        
+        /* User Bubble */
+        .user-msg { 
+            background-color: #2f3032; 
+            color: white; 
+            padding: 14px 22px; 
+            border-radius: 24px; 
+            align-self: flex-end; 
+            max-width: 75%;
+            word-wrap: break-word;
+            font-size: 1.05rem;
+        }
+
+        /* AI Message (Clean Display) */
+        .ai-msg { 
+            color: #fff; 
+            padding: 5px 10px; 
+            align-self: flex-start; 
+            max-width: 90%;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .ai-msg img {
+            max-width: 100%;
+            max-height: 280px;
+            border-radius: 16px;
+            display: block;
+        }
+
+        /* Input Wrapper with Transparent Background */
+        .input-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20px 25px 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.95) 25%, #000 100%);
+            z-index: 5;
+        }
+
+        /* Bigger & Polished Gemini Style Search Bar */
+        .input-container { 
+            background-color: #1e1f22; 
+            border-radius: 35px; 
+            display: flex; 
+            align-items: center; 
+            padding: 6px 10px; 
+            border: 1px solid #3c4043;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        input[type="text"] { 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            flex-grow: 1; 
+            padding: 12px 15px; 
+            outline: none; 
+            font-size: 1.1rem; 
+            min-width: 0; 
+        }
+
+        /* Premium Icon Buttons (Locked Positions) */
+        .icon-btn { 
+            background: none; 
+            border: none; 
+            color: #80868b; 
+            cursor: pointer; 
+            width: 44px;
+            height: 44px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 50%;
+            flex-shrink: 0; 
+            transition: all 0.2s ease;
+        }
+        .icon-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        
+        #sendBtn {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+        #sendBtn:hover { background: rgba(255,255,255,0.15); }
+
+        /* Modals (Popups) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background: #202124; padding: 25px; border-radius: 15px; width: 85%; max-width: 400px; border: 1px solid #444; }
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; background: #111; border: 1px solid #555; color: #fff; box-sizing: border-box; border-radius: 8px; font-size: 1rem; }
+        textarea.modal-input { font-family: inherit; resize: none; }
+
+        /* Small Image Preview in Modal */
+        .preview-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .preview-container img {
+            max-height: 120px;
+            border-radius: 8px;
+            border: 1px solid #555;
+        }
+
+        /* Database Control Drawer (Menu Sidebar) */
+        .drawer {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background-color: #1e1f22;
+            z-index: 200;
+            transition: left 0.3s ease;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            padding: 30px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .drawer.open { left: 0; }
+        .drawer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 150;
+        }
+        .drawer-btn {
+            background-color: #2f3032;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .drawer-btn:hover { background-color: #3e4042; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <svg class="menu-icon" onclick="toggleDrawer(true)"><path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2"/></svg>
+        <h3>OpenCLOCK</h3>
+        <svg class="search-icon"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/></svg>
+    </header>
+
+    <div id="drawerOverlay" class="drawer-overlay" onclick="toggleDrawer(false)"></div>
+    <div id="drawer" class="drawer">
+        <h3 style="margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 15px;">App Settings</h3>
+        
+        <button class="drawer-btn" onclick="exportDatabase()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export Backup (JSON)
+        </button>
+
+        <button class="drawer-btn" onclick="document.getElementById('dbImporter').click()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            Import Backup (JSON)
+        </button>
+        <input type="file" id="dbImporter" accept=".json" style="display: none;" onchange="importDatabase(event)">
+
+        <button class="drawer-btn" onclick="clearDatabase()" style="background-color: #5a1818; border-color: #8a2828; margin-top: auto;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Clear All Data
+        </button>
+    </div>
+
+    <div id="chat-container">
+        </div>
+
+    <div class="input-wrapper">
+        <div class="input-container">
+            <input type="file" id="imageLoader" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+            
+            <button class="icon-btn" onclick="document.getElementById('imageLoader').click()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            
+            <input type="text" id="searchBox" placeholder="Ask OpenCLOCK" onkeypress="handleEnter(event)" oninput="checkAutoEdit(event)">
+            
+            <button id="sendBtn" onclick="sendMessage()" class="icon-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="textModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; margin-bottom: 15px;">Text Edit Mode</h3>
+            <input type="text" id="editKey" class="modal-input" placeholder="Keyword (e.g., google)">
+            <textarea id="editValue" class="modal-input" rows="4" placeholder="About..."></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button onclick="closeModal('textModal')" style="flex: 1; background: #444; color: #fff; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">Cancel</button>
+                <button onclick="saveTextData()" style="flex: 1; background: #fff; color: #000; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; margin-bottom: 10px;">Save Image</h3>
+            <div class="preview-container">
+                <img id="modalImgPreview" src="" alt="Selected Image">
+            </div>
+            <input type="text" id="imageKey" class="modal-input" placeholder="Image Title (e.g., Apple)">
+            <textarea id="imageAbout" class="modal-input" rows="3" placeholder="About this image..."></textarea>
+            
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button onclick="closeModal('imageModal')" style="flex: 1; background: #444; color: #fff; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer;">Cancel</button>
+                <button onclick="saveImageData()" style="flex: 1; background: #fff; color: #000; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const searchBox = document.getElementById('searchBox');
+        
+        let db = {};
+        let tempImageBase64 = ""; 
+
+        // Load database from localStorage on Startup
+        try {
+            if (localStorage.getItem('openClockData')) {
+                db = JSON.parse(localStorage.getItem('openClockData'));
+            }
+        } catch (e) {
+            console.log("LocalStorage not supported. Running in temp mode.");
+        }
+
+        // Toggle Settings Drawer
+        function toggleDrawer(isOpen) {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('drawerOverlay');
+            if(isOpen) {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+            } else {
+                drawer.classList.remove('open');
+                overlay.style.display = 'none';
+            }
+        }
+
+        // Detect "edit" keyword
+        function checkAutoEdit(e) {
+            const val = e.target.value.trim().toLowerCase();
+            if (val === 'edit') {
+                e.target.value = ''; 
+                document.getElementById('textModal').style.display = 'flex';
+            }
+        }
+
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+        // Process image selection
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                tempImageBase64 = e.target.result;
+                document.getElementById('modalImgPreview').src = tempImageBase64;
+                document.getElementById('imageModal').style.display = 'flex'; 
+            };
+            reader.readAsDataURL(file);
+            event.target.value = ''; 
+        }
+
+        function sendMessage() {
+            const query = searchBox.value.trim();
+            if (!query) return;
+
+            // Show User Message Bubble
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user-msg';
+            userDiv.innerText = query;
+            chatContainer.appendChild(userDiv);
+            searchBox.value = '';
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+
+            // Respond
+            setTimeout(() => {
+                const data = db[query.toLowerCase()];
+                if (data) {
+                    const aiDiv = document.createElement('div');
+                    aiDiv.className = 'ai-msg';
+                    
+                    if (typeof data === 'object') {
+                        if (data.type === 'text') {
+                            aiDiv.innerText = data.text;
+                        } else if (data.type === 'image_only') {
+                            const img = document.createElement('img');
+                            img.src = data.src;
+                            aiDiv.appendChild(img);
+                        } else if (data.type === 'image_and_text') {
+                            const img = document.createElement('img');
+                            img.src = data.src;
+                            img.style.marginBottom = "10px";
+                            aiDiv.appendChild(img);
+                            
+                            const textSpan = document.createElement('div');
+                            textSpan.innerText = data.text;
+                            aiDiv.appendChild(textSpan);
+                        }
+                    } else {
+                        aiDiv.innerText = data; // Backward compatibility
+                    }
+                    
+                    chatContainer.appendChild(aiDiv);
+                    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+                }
+            }, 400); 
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'textModal') {
+                document.getElementById('editKey').value = '';
+                document.getElementById('editValue').value = '';
+            } else {
+                document.getElementById('imageKey').value = '';
+                document.getElementById('imageAbout').value = '';
+                tempImageBase64 = "";
+            }
+        }
+
+        // Save normal text entries
+        function saveTextData() {
+            const key = document.getElementById('editKey').value.trim().toLowerCase();
+            const value = document.getElementById('editValue').value.trim();
+            
+            if (!key || !value) { alert("Please fill both boxes!"); return; }
+
+            db[key] = { type: 'text', text: value };
+            persistData();
+            closeModal('textModal');
+        }
+
+        // Save image data in 3 structures
+        function saveImageData() {
+            const titleInput = document.getElementById('imageKey').value.trim().toLowerCase();
+            const aboutInput = document.getElementById('imageAbout').value.trim();
+            
+            if (!titleInput || !aboutInput) { alert("Please fill all details!"); return; }
+            if (!tempImageBase64) { alert("No image chosen!"); return; }
+
+            // 1. Name only (Apple) -> returns About Text only
+            db[titleInput] = {
+                type: 'text',
+                text: aboutInput
+            };
+
+            // 2. Name + image (Apple image) -> returns Image only
+            db[titleInput + " image"] = {
+                type: 'image_only',
+                src: tempImageBase64
+            };
+
+            // 3. Name + all (Apple all) -> returns Image + About Text both
+            db[titleInput + " all"] = {
+                type: 'image_and_text',
+                src: tempImageBase64,
+                text: aboutInput
+            };
+
+            persistData();
+            closeModal('imageModal');
+        }
+
+        function persistData() {
+            try {
+                localStorage.setItem('openClockData', JSON.stringify(db));
+            } catch (e) {
+                console.log("Saved safely to temporary memory.");
+            }
+        }
+
+        /* --- ADVANCED UNIVERSAL DATA PLATFORM FEATURES --- */
+
+        // 1. Export Data as a downloadable JSON file
+        function exportDatabase() {
+            if (Object.keys(db).length === 0) {
+                alert("Database is currently empty. Add some data first!");
+                return;
+            }
+            
+            // Format data beautifully inside JSON
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "openClock_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            
+            toggleDrawer(false); // close settings
+        }
+
+        // 2. Import Data from any selected JSON backup file
+        function importDatabase(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Simple validation
+                    if (typeof importedData === 'object' && importedData !== null) {
+                        db = { ...db, ...importedData }; // Merge new data with existing
+                        persistData();
+                        alert("Database Imported Successfully!");
+                        location.reload(); // Refresh to clean reload
+                    } else {
+                        alert("Invalid file format. Please upload a correct JSON backup.");
+                    }
+                } catch (err) {
+                    alert("Error parsing file. Make sure it is a valid backup file.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input
+            toggleDrawer(false);
+        }
+
+        // 3. Reset/Clear database
+        function clearDatabase() {
+            if (confirm("Are you absolutely sure? This will delete all your text and images!")) {
+                db = {};
+                localStorage.removeItem('openClockData');
+                alert("All data wiped out clean.");
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
