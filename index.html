@@ -2104,9 +2104,9 @@
                 aiDiv.className = 'ai-msg fallback-msg';
                 const displayQuery = rawKey || 'that';
                 const fallbackText =
-                    `I couldn't find anything about "<strong>${displayQuery}</strong>" in the database.`;
+                    `"<strong>${displayQuery}</strong>".`;
                 const hint =
-                    `💡 You can add data using the <strong>🔍 Search</strong> icon → type <strong>"edit"</strong> to open Edit Mode, then create a new entry. Or use the <strong>OpenCLOCK File</strong> or <strong>OpenCLOCK Database</strong> from the menu.`;
+                    `<strong></strong><strong>""</strong><strong></strong><strong></strong>.`;
                 aiDiv.innerHTML = `${fallbackText}<span class="hint">${hint}</span>`;
                 chatContainer.appendChild(aiDiv);
                 chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
