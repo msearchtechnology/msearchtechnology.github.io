@@ -420,7 +420,7 @@
         </div>
         
         <!-- Only Logo Name is Red -->
-        <a class="logo-text" onclick="showCategory('All')">Originel</a>
+        <a class="logo-text" onclick="showCategory('All')">ORIGINELS</a>
         
         <div class="header-right">
             <!-- Home Icon -->
@@ -504,27 +504,7 @@
     </div>
 
     <script>
-        // Default Articles
-        const initialArticles = [
-            {
-                id: 1,
-                title: "US to announce deal allowing Saudi Arabia a nuclear programme",
-                about: "The agreement would fulfil a long-held Saudi ambition but could attract concern in Israel and from some US lawmakers.",
-                image: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&auto=format&fit=crop",
-                category: "World",
-                date: "23 mins ago",
-                layout: "hero"
-            },
-            {
-                id: 2,
-                title: "Trump threatens to target Iran's bridges and power plants if Hormuz attacks persist",
-                about: "Tensions rise as international leaders urge diplomatic restraint amidst growing conflict threats in the region.",
-                image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=300&auto=format&fit=crop",
-                category: "World",
-                date: "5 hrs ago",
-                layout: "standard"
-            }
-        ];
+        
 
         // App State
         let articles = JSON.parse(localStorage.getItem('news_articles')) || initialArticles;
