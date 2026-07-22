@@ -446,7 +446,7 @@
         </div>
         
         <!-- Only Logo Name is Red -->
-        <a class="logo-text" onclick="showCategory('All')">Originel</a>
+        <a class="logo-text" onclick="showCategory('All')">ORIGINEL</a>
         
         <div class="header-right">
             <!-- Home Icon -->
@@ -459,7 +459,7 @@
     <!-- Search Bar & Category Drawer -->
     <div class="search-container" id="searchContainer">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search news, ask anything, or type 'edit'...">
+            <input type="text" id="searchInput" placeholder="Search">
             <button onclick="handleSearch()" aria-label="Search">
                 <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             </button>
@@ -532,26 +532,7 @@
 
     <script>
         // Default Articles
-        const initialArticles = [
-            {
-                id: 1,
-                title: "US to announce deal allowing Saudi Arabia a nuclear programme",
-                about: "The agreement would fulfil a long-held Saudi ambition but could attract concern in Israel and from some US lawmakers.",
-                image: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&auto=format&fit=crop",
-                category: "World",
-                date: "23 mins ago",
-                layout: "hero"
-            },
-            {
-                id: 2,
-                title: "Trump threatens to target Iran's bridges and power plants if Hormuz attacks persist",
-                about: "Tensions rise as international leaders urge diplomatic restraint amidst growing conflict threats in the region.",
-                image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=300&auto=format&fit=crop",
-                category: "World",
-                date: "5 hrs ago",
-                layout: "standard"
-            }
-        ];
+        
 
         // App State
         let articles = JSON.parse(localStorage.getItem('news_articles')) || initialArticles;
@@ -621,7 +602,7 @@
                     <div class="ai-brain-box">
                         <div class="ai-brain-header">
                             <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 15h-2v-6h2zm0-8h-2V7h2z"/></svg>
-                            Direct Answer
+                            AI Answer
                         </div>
                         <div class="ai-brain-content">
                             <strong>Summary:</strong> ${directAnswer}
