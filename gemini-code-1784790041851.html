@@ -368,7 +368,7 @@
     <!-- Search Bar & Menu -->
     <div class="search-container" id="searchContainer">
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search articles (Type 'edit' to open admin panel)...">
+            <input type="text" id="searchInput" placeholder="Search articles">
             <button onclick="handleSearch()" aria-label="Search">
                 <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             </button>
@@ -386,7 +386,7 @@
 
         <!-- Detail Article Page (Headline Click Target) -->
         <div id="detailView" class="detail-view">
-            <button class="back-btn" onclick="goHome()">← Back to Home Feed</button>
+            <button class="back-btn" onclick="goHome()">Back to Home</button>
             <div class="detail-content" id="detailContentContainer"></div>
         </div>
     </main>
@@ -462,30 +462,7 @@
     </div>
 
     <script>
-        const initialArticles = [
-            {
-                id: 1,
-                title: "US to announce deal allowing Saudi Arabia a nuclear programme",
-                about: "The agreement would fulfil a long-held Saudi ambition but could attract concern in Israel and US lawmakers.",
-                fullBio: "The bilateral agreement between the United States and Saudi Arabia marks a significant shift in Middle Eastern geopolitics. Negotiations lasted over eighteen months, focusing heavily on non-proliferation safeguards and civil nuclear energy development.",
-                founderBio: "Saudi Atomic Energy Commission (SAEC) was established in 1977. Overseen by the Ministry of Energy, driving sustainable national energy transitions.",
-                images: ["https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&auto=format&fit=crop"],
-                category: "World",
-                date: "23 mins ago",
-                layout: "hero"
-            },
-            {
-                id: 2,
-                title: "Global Tech Giant Unveils Next-Gen AI Microchips",
-                about: "A new era of high-speed processors designed specifically for neural processing units and deep learning systems.",
-                fullBio: "The technological breakthrough enables processing speeds 400% faster than previous architecture while consuming 30% less power. Industry experts predict widespread adoption across mobile devices within the next year.",
-                founderBio: "Tech Corp was founded in 2004 by Alex Vance. Headquartered in Silicon Valley, California, specializing in advanced semiconductor technologies.",
-                images: ["https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop"],
-                category: "Tech",
-                date: "2 hrs ago",
-                layout: "standard"
-            }
-        ];
+        
 
         let articles = JSON.parse(localStorage.getItem('news_articles')) || initialArticles;
         let currentCategory = 'All';
@@ -675,7 +652,7 @@
             if (article.founderBio && article.founderBio.trim() !== "") {
                 bioHtml = `
                     <div class="bio-box">
-                        <h3>🏢 Founder & Company Bio</h3>
+                        <h3>Details</h3>
                         <p>${article.founderBio.replace(/\n/g, '<br>')}</p>
                     </div>
                 `;
