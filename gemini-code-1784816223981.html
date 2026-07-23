@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORIGINELS</title>
+    <!-- HTML2Canvas CDN for Article Download Feature -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #111111;
+            --sub-text: #555555;
+            --border-color: #e5e5e5;
+            --card-bg: #f9f9f9;
+            --logo-color: #bb1919;
+            --accent-color: #333333;
+            --drawer-bg: #f7f7f7;
+            --btn-bg: #111111;
+            --btn-text: #ffffff;
+            --bio-bg: #f4f6f8;
+            --breaking-bg: #bb1919;
+            --breaking-text: #ffffff;
+        }
+
+        body.dark-theme {
+            --bg-color: #121212;
+            --text-color: #f1f1f1;
+            --sub-text: #aaaaaa;
+            --border-color: #2a2a2a;
+            --card-bg: #1e1e1e;
+            --accent-color: #cccccc;
+            --drawer-bg: #181818;
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+            --bio-bg: #1a1e24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 40px;
+        }
+
+        /* BBC Style Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            border-bottom: 2px solid var(--border-color);
+            background: var(--bg-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 4px;
+        }
+
+        .icon-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .logo-text {
+            color: var(--logo-color);
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* BREAKING NEWS TICKER BANNER */
+        .breaking-news-bar {
+            background-color: var(--breaking-bg);
+            color: var(--breaking-text);
+            display: none;
+            align-items: center;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            overflow: hidden;
+            position: relative;
+            z-index: 90;
+        }
+
+        .breaking-news-bar.active {
+            display: flex;
+        }
+
+        .breaking-label {
+            background-color: #000;
+            color: #fff;
+            padding: 2px 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 12px;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+
+        .breaking-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Search & Navigation */
+        .search-container {
+            display: none;
+            padding: 16px;
+            background: var(--drawer-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-container.active {
+            display: block;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 14px;
+            font-size: 16px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            outline: none;
+            border-radius: 4px;
+        }
+
+        .search-box button {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .search-box button svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--btn-text);
+        }
+
+        .category-menu {
+            list-style: none;
+        }
+
+        .category-menu li {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-menu li svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* Main Container */
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        .filter-badge {
+            display: inline-block;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        /* Images */
+        .single-thumbnail-box {
+            margin-bottom: 12px;
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .single-thumbnail-box img {
+            width: 100%;
+            height: auto;
+            max-height: 480px;
+            object-fit: contain;
+            background-color: rgba(0,0,0,0.03);
+            border-radius: 6px;
+            display: block;
+            border: 1px solid var(--border-color);
+        }
+
+        .image-count-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 20px;
+        }
+
+        /* Article Cards in Feed */
+        .article-hero, .article-list-item {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .article-hero h2 a, .article-list-item h3 a, .article-text-only h2 a {
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .article-hero h2 a:hover, .article-list-item h3 a:hover, .article-text-only h2 a:hover {
+            color: var(--sub-text);
+            text-decoration: underline;
+        }
+
+        .article-hero h2 { font-size: 23px; line-height: 1.35; margin-bottom: 8px; font-weight: 800; }
+        .article-hero p { font-size: 16px; color: var(--sub-text); line-height: 1.5; margin-bottom: 10px; }
+        
+        .article-list-item h3 { font-size: 20px; line-height: 1.35; margin-bottom: 8px; font-weight: 700; }
+        .article-list-item p { font-size: 15px; color: var(--sub-text); line-height: 1.5; margin-bottom: 10px; }
+
+        .meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .meta { font-size: 13px; color: var(--sub-text); }
+        .meta span { margin-right: 8px; }
+        .meta .cat-name { font-weight: bold; color: var(--text-color); }
+
+        .article-actions { display: flex; gap: 12px; }
+        .action-icon-btn {
+            background: none; border: none; cursor: pointer; color: var(--text-color);
+            display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600;
+        }
+        .action-icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        /* Text only article */
+        .article-text-only {
+            padding: 18px; margin-bottom: 28px;
+            border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 6px;
+        }
+        .article-text-only h2 { font-size: 22px; line-height: 1.35; margin-bottom: 8px; font-weight: 800; }
+        .article-text-only p { font-size: 16px; color: var(--sub-text); line-height: 1.55; margin-bottom: 10px; }
+
+        /* Detail View Page */
+        .detail-view { display: none; }
+        .detail-view.active { display: block; }
+
+        .back-btn {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-content h1 {
+            font-size: 26px;
+            line-height: 1.3;
+            margin-bottom: 14px;
+            font-weight: 800;
+        }
+
+        .detail-full-text {
+            font-size: 18px;
+            line-height: 1.65;
+            color: var(--text-color);
+            margin-bottom: 24px;
+        }
+
+        /* Bio Box */
+        .bio-box {
+            background: var(--bio-bg);
+            padding: 18px;
+            border-radius: 6px;
+            margin-top: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .bio-box h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bio-box p {
+            font-size: 15px;
+            line-height: 1.55;
+            color: var(--sub-text);
+        }
+
+        /* Lightbox Modal with Caption */
+        .lightbox-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(10px); z-index: 2000;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+        .lightbox-modal.active { display: flex; }
+        .lightbox-content {
+            position: relative; max-width: 90%; max-height: 75vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .lightbox-content img { max-width: 100%; max-height: 75vh; object-fit: contain; border-radius: 4px; }
+        
+        .lightbox-caption {
+            color: #f1f1f1;
+            font-size: 15px;
+            margin-top: 15px;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.4;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .lightbox-btn {
+            position: absolute; background: rgba(255, 255, 255, 0.25); color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.4); font-size: 22px; width: 46px; height: 46px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%;
+            user-select: none; z-index: 2100; transition: background 0.2s, transform 0.2s;
+        }
+        .lightbox-btn:hover { background: rgba(255, 255, 255, 0.45); transform: scale(1.08); }
+        .lightbox-prev { left: 15px; } 
+        .lightbox-next { right: 15px; }
+        .lightbox-close { top: 20px; right: 20px; position: fixed; font-size: 20px; }
+
+        /* Admin Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .admin-card {
+            background: var(--bg-color); color: var(--text-color); width: 92%; max-width: 520px;
+            padding: 22px; border-radius: 8px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color);
+        }
+        .admin-card h3 { margin-bottom: 12px; font-size: 16px; border-bottom: 2px solid var(--text-color); padding-bottom: 6px; margin-top: 15px; }
+        .theme-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .theme-btn { flex: 1; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); cursor: pointer; font-weight: bold; border-radius: 4px; }
+        .theme-btn.active { background: var(--btn-bg); color: var(--btn-text); }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-size: 15px; border-radius: 4px; }
+        .btn-submit { background: var(--btn-bg); color: var(--btn-text); border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px; border-radius: 4px; }
+        .btn-close { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 10px; width: 100%; cursor: pointer; margin-top: 8px; font-size: 14px; border-radius: 4px; }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed var(--border-color); font-size: 14px; }
+        .manage-actions { display: flex; gap: 6px; }
+        .btn-action { background: var(--btn-bg); color: var(--btn-text); border: none; padding: 5px 10px; font-size: 12px; cursor: pointer; border-radius: 4px; }
+        
+        /* IMAGE PREVIEW IN EDIT MODE */
+        .image-preview-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .image-preview-item {
+            position: relative;
+            width: 75px;
+            height: 75px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .delete-img-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(220, 20, 20, 0.85);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Off-screen download container */
+        #downloadContainer {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 650px;
+            background: #ffffff;
+            color: #111111;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <button class="icon-btn" id="menuToggle" onclick="toggleAndScrollSearch()" aria-label="Toggle Search">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+        </div>
+        
+        <a class="logo-text" onclick="goHome()">ORIGINELS</a>
+        
+        <div class="header-right">
+            <button class="icon-btn" onclick="goHome()" aria-label="Home">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- BREAKING NEWS TICKER -->
+    <div class="breaking-news-bar" id="breakingBar">
+        <span class="breaking-label">BREAKING</span>
+        <span class="breaking-text" id="breakingTextDisplay">...</span>
+    </div>
+
+    <!-- Search Bar & Menu -->
+    <div class="search-container" id="searchContainer">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search articles">
+            <button onclick="handleSearch()" aria-label="Search">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+        </div>
+        <ul class="category-menu" id="categoryMenuList"></ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <main>
+        <!-- Home Feed -->
+        <div id="homeView">
+            <div id="filterStatus"></div>
+            <div id="articlesContainer"></div>
+        </div>
+
+        <!-- Detail Article Page -->
+        <div id="detailView" class="detail-view">
+            <button class="back-btn" onclick="goHome()">Back to Home</button>
+            <div class="detail-content" id="detailContentContainer"></div>
+        </div>
+    </main>
+
+    <!-- Lightbox Modal with Navigation & Captions -->
+    <div class="lightbox-modal" id="lightboxModal">
+        <button class="lightbox-btn lightbox-close" onclick="closeLightbox()">✕</button>
+        <button class="lightbox-btn lightbox-prev" id="lightboxPrevBtn" onclick="navigateLightbox(-1)">❮</button>
+        <div class="lightbox-content">
+            <img id="lightboxImage" src="" alt="Fullscreen View">
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+        </div>
+        <button class="lightbox-btn lightbox-next" id="lightboxNextBtn" onclick="navigateLightbox(1)">❯</button>
+    </div>
+
+    <!-- Hidden element used for downloading full article as Image -->
+    <div id="downloadContainer"></div>
+
+    <!-- Admin Panel -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="admin-card">
+            <h3>Settings & Theme</h3>
+            <div class="theme-selector">
+                <button class="theme-btn" id="lightBtn" onclick="setTheme('light')">Light Theme</button>
+                <button class="theme-btn" id="darkBtn" onclick="setTheme('dark')">Dark Theme</button>
+            </div>
+
+            <!-- BREAKING NEWS EDIT SECTION -->
+            <h3>Manage Breaking News</h3>
+            <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                <div class="form-group">
+                    <label>Breaking News Text</label>
+                    <input type="text" id="breakingTextInput" placeholder="Enter headline text...">
+                </div>
+                <div class="form-group">
+                    <label>Auto-hide Timer (In Minutes - Optional)</label>
+                    <input type="number" id="breakingTimerInput" placeholder="e.g. 10 (Leave empty for no timer)">
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn-action" onclick="saveBreakingNews()" style="padding: 8px 12px; font-size: 13px;">Publish / Update</button>
+                    <button type="button" class="btn-action" onclick="removeBreakingNews()" style="padding: 8px 12px; font-size: 13px; background:#bb1919; color:white;">Remove Breaking News</button>
+                </div>
+            </div>
+
+            <h3 id="formHeading">Add / Edit Article</h3>
+            <form id="articleForm">
+                <input type="hidden" id="editingArticleId" value="">
+                <div class="form-group">
+                    <label>Article Headline</label>
+                    <input type="text" id="postTitle" placeholder="Enter headline..." required>
+                </div>
+                <div class="form-group">
+                    <label>Short Summary (Feed Preview)</label>
+                    <textarea id="postAbout" rows="2" placeholder="Short text shown in home feed..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Full Article Content</label>
+                    <textarea id="postFullBio" rows="5" placeholder="Detailed article text when headline is clicked..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Founder / Company Biography (Optional Box)</label>
+                    <textarea id="postFounderBio" rows="3" placeholder="e.g. Founded in 2010 by John Doe. Headquartered in New York..."></textarea>
+                </div>
+
+                <!-- Existing Images Manager inside Edit Mode -->
+                <div class="form-group" id="existingImagesGroup" style="display:none;">
+                    <label>Current Images (Click ✕ to delete)</label>
+                    <div class="image-preview-container" id="existingImagesContainer"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload New Images (Multiple supported)</label>
+                    <input type="file" id="postImage" accept="image/*" multiple>
+                </div>
+                <div class="form-group">
+                    <label>Image Captions / Descriptions (Separate multiple with commas `,`)</label>
+                    <textarea id="postImageCaptions" rows="2" placeholder="e.g. Photo 1: Riyadh Nuclear Plant, Photo 2: Delegation Meeting"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Category Name</label>
+                    <input type="text" id="postCategory" placeholder="e.g. Tech, Business, World" required>
+                </div>
+                <div class="form-group">
+                    <label>Date / Time Stamp (Auto-filled on new posts)</label>
+                    <input type="text" id="postDate" placeholder="Auto-generated if left blank">
+                </div>
+                <div class="form-group">
+                    <label>Layout Type</label>
+                    <select id="postLayout">
+                        <option value="hero">Main Top Banner</option>
+                        <option value="standard">Standard Article</option>
+                        <option value="text-only">Text Only Article</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit" id="submitBtn">Save Article</button>
+            </form>
+
+            <div class="manage-section" style="margin-top: 20px;">
+                <h3 style="font-size: 15px;">Manage Articles</h3>
+                <div id="manageList"></div>
+            </div>
+
+            <button type="button" class="btn-close" onclick="closeAdminModal()">Close Panel</button>
+        </div>
+    </div>
+
+    <script>
+        const initialArticles = [
+            {
+                id: 1,
+                title: "US to announce deal allowing Saudi Arabia a nuclear programme",
+                about: "The agreement would fulfil a long-held Saudi ambition but could attract concern in Israel and US lawmakers.",
+                fullBio: "The bilateral agreement between the United States and Saudi Arabia marks a significant shift in Middle Eastern geopolitics. Negotiations lasted over eighteen months, focusing heavily on non-proliferation safeguards and civil nuclear energy development.",
+                founderBio: "Saudi Atomic Energy Commission (SAEC) was established in 1977. Overseen by the Ministry of Energy, driving sustainable national energy transitions.",
+                images: ["https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&auto=format&fit=crop"],
+                imageCaptions: ["Saudi nuclear facility under discussion."],
+                category: "World",
+                date: "23 July 2026",
+                layout: "hero"
+            },
+            {
+                id: 2,
+                title: "Global Tech Giant Unveils Next-Gen AI Microchips",
+                about: "A new era of high-speed processors designed specifically for neural processing units and deep learning systems.",
+                fullBio: "The technological breakthrough enables processing speeds 400% faster than previous architecture while consuming 30% less power. Industry experts predict widespread adoption across mobile devices within the next year.",
+                founderBio: "Tech Corp was founded in 2004 by Alex Vance. Headquartered in Silicon Valley, California, specializing in advanced semiconductor technologies.",
+                images: ["https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop"],
+                imageCaptions: ["Next-generation semiconductor silicon chip."],
+                category: "Tech",
+                date: "23 July 2026",
+                layout: "standard"
+            }
+        ];
+
+        let articles = JSON.parse(localStorage.getItem('news_articles')) || initialArticles;
+        let currentCategory = 'All';
+
+        let currentLightboxImages = [];
+        let currentLightboxCaptions = [];
+        let currentLightboxIndex = 0;
+
+        // Temporary storage for images being edited
+        let currentEditingImages = [];
+
+        // Breaking news timer reference
+        let breakingTimerTimeout = null;
+
+        const searchContainer = document.getElementById('searchContainer');
+        const searchInput = document.getElementById('searchInput');
+        const categoryMenuList = document.getElementById('categoryMenuList');
+        const articlesContainer = document.getElementById('articlesContainer');
+        const adminModal = document.getElementById('adminModal');
+        const articleForm = document.getElementById('articleForm');
+        const filterStatus = document.getElementById('filterStatus');
+        const manageList = document.getElementById('manageList');
+        const editingArticleId = document.getElementById('editingArticleId');
+        const homeView = document.getElementById('homeView');
+        const detailView = document.getElementById('detailView');
+        const detailContentContainer = document.getElementById('detailContentContainer');
+
+        /* HELPER: GET AUTOMATIC DATE IN "23 July 2026" FORMAT */
+        function getAutoFormattedDate() {
+            const date = new Date();
+            const day = date.getDate();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day} ${month} ${year}`;
+        }
+
+        /* BREAKING NEWS MANAGEMENT */
+        function loadBreakingNews() {
+            const data = JSON.parse(localStorage.getItem('news_breaking_config'));
+            if (data && data.text) {
+                if (data.expiry && Date.now() > data.expiry) {
+                    removeBreakingNews();
+                    return;
+                }
+                document.getElementById('breakingTextDisplay').innerText = data.text;
+                document.getElementById('breakingBar').classList.add('active');
+                document.getElementById('breakingTextInput').value = data.text;
+
+                if (data.expiry) {
+                    const remainingMs = data.expiry - Date.now();
+                    if (breakingTimerTimeout) clearTimeout(breakingTimerTimeout);
+                    breakingTimerTimeout = setTimeout(() => {
+                        removeBreakingNews();
+                    }, remainingMs);
+                }
+            } else {
+                document.getElementById('breakingBar').classList.remove('active');
+            }
+        }
+
+        function saveBreakingNews() {
+            const text = document.getElementById('breakingTextInput').value.trim();
+            const timerMins = parseInt(document.getElementById('breakingTimerInput').value);
+
+            if (!text) {
+                alert("Please enter breaking news text!");
+                return;
+            }
+
+            let expiry = null;
+            if (timerMins && timerMins > 0) {
+                expiry = Date.now() + (timerMins * 60 * 1000);
+            }
+
+            const config = { text, expiry };
+            localStorage.setItem('news_breaking_config', JSON.stringify(config));
+            loadBreakingNews();
+            alert("Breaking News updated!");
+        }
+
+        function removeBreakingNews() {
+            localStorage.removeItem('news_breaking_config');
+            document.getElementById('breakingBar').classList.remove('active');
+            document.getElementById('breakingTextInput').value = '';
+            document.getElementById('breakingTimerInput').value = '';
+            if (breakingTimerTimeout) clearTimeout(breakingTimerTimeout);
+        }
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('darkBtn').classList.add('active');
+                document.getElementById('lightBtn').classList.remove('active');
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.getElementById('lightBtn').classList.add('active');
+                document.getElementById('darkBtn').classList.remove('active');
+            }
+            localStorage.setItem('news_theme', theme);
+        }
+
+        setTheme(localStorage.getItem('news_theme') || 'light');
+
+        function toggleAndScrollSearch() {
+            const isActive = searchContainer.classList.contains('active');
+            if (!isActive) {
+                searchContainer.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setTimeout(() => searchInput.focus(), 300);
+            } else {
+                searchContainer.classList.remove('active');
+            }
+        }
+
+        function goHome() {
+            detailView.classList.remove('active');
+            searchContainer.classList.remove('active');
+            searchInput.value = '';
+
+            currentCategory = 'All';
+            filterStatus.innerHTML = '';
+            renderArticles();
+
+            homeView.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleSearch() {
+            const query = searchInput.value.trim().toLowerCase();
+            if (query === 'edit') {
+                resetForm();
+                renderManageList();
+                adminModal.classList.add('active');
+                searchInput.value = '';
+                return;
+            }
+
+            if (!query) return;
+
+            detailView.classList.remove('active');
+            homeView.style.display = 'block';
+            
+            const matchedResults = articles.filter(a => 
+                a.title.toLowerCase().includes(query) || 
+                (a.about && a.about.toLowerCase().includes(query)) ||
+                a.category.toLowerCase().includes(query)
+            );
+
+            filterStatus.innerHTML = `<div class="filter-badge">Results for: "${query}" (${matchedResults.length})</div>`;
+            renderArticleList(matchedResults);
+            searchContainer.classList.remove('active');
+        }
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSearch();
+        });
+
+        function closeAdminModal() {
+            adminModal.classList.remove('active');
+            resetForm();
+        }
+
+        const arrowSvg = `<svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>`;
+
+        function renderCategories() {
+            const categories = ['All', ...new Set(articles.map(a => a.category))];
+            categoryMenuList.innerHTML = categories.map(cat => `
+                <li onclick="showCategory('${cat}')">
+                    <span>${cat}</span>
+                    ${arrowSvg}
+                </li>
+            `).join('');
+        }
+
+        function showCategory(cat) {
+            currentCategory = cat;
+            detailView.classList.remove('active');
+            homeView.style.display = 'block';
+            filterStatus.innerHTML = cat === 'All' ? '' : `<div class="filter-badge">Category: ${cat}</div>`;
+            renderArticles();
+            searchContainer.classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderArticles() {
+            const filtered = currentCategory === 'All' 
+                ? articles 
+                : articles.filter(a => a.category.toLowerCase() === currentCategory.toLowerCase());
+            
+            renderArticleList(filtered);
+        }
+
+        function downloadArticle(id) {
+            const article = articles.find(a => a.id === id);
+            if (!article) return;
+
+            const container = document.getElementById('downloadContainer');
+            let imagesArray = article.images || (article.image ? [article.image] : []);
+            
+            let imgHtml = '';
+            if (imagesArray.length > 0) {
+                imgHtml = `<img src="${imagesArray[0]}" style="width:100%; border-radius:6px; margin-bottom:15px;" crossorigin="anonymous">`;
+            }
+
+            let bioHtml = '';
+            if (article.founderBio && article.founderBio.trim() !== '') {
+                bioHtml = `
+                    <div style="background:#f4f6f8; border:1px solid #e5e5e5; padding:15px; margin-top:20px; border-radius:6px;">
+                        <h4 style="margin-bottom:6px; font-size:15px;">Details</h4>
+                        <p style="font-size:14px; color:#555; line-height:1.5;">${article.founderBio}</p>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="border-bottom:2px solid #bb1919; padding-bottom:8px; margin-bottom:15px;">
+                    <span style="color:#bb1919; font-size:22px; font-weight:900;">ORIGINELS</span>
+                </div>
+                ${imgHtml}
+                <h2 style="font-size:20px; line-height:1.3; margin-bottom:10px; font-weight:800; color:#111;">${article.title}</h2>
+                <div style="font-size:12px; color:#666; margin-bottom:15px;">${article.date} | ${article.category}</div>
+                <div style="font-size:15px; line-height:1.6; color:#222;">
+                    ${article.fullBio ? article.fullBio.replace(/\n/g, '<br>') : (article.about || '')}
+                </div>
+                ${bioHtml}
+            `;
+
+            html2canvas(container, { useCORS: true, allowTaint: true, scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${article.title.substring(0, 20)}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function renderArticleList(list) {
+            if (list.length === 0) {
+                articlesContainer.innerHTML = '<p style="padding: 20px 0; color: var(--sub-text);">No articles found.</p>';
+                return;
+            }
+
+            articlesContainer.innerHTML = list.map(item => {
+                const imagesArray = item.images || (item.image ? [item.image] : []);
+                
+                let thumbnailHtml = '';
+                if (imagesArray.length > 0) {
+                    thumbnailHtml = `
+                        <div class="single-thumbnail-box" onclick="openLightbox(${item.id}, 0)">
+                            <img src="${imagesArray[0]}" alt="Article Image">
+                            ${imagesArray.length > 1 ? `<div class="image-count-badge">📷 1/${imagesArray.length}</div>` : ''}
+                        </div>
+                    `;
+                }
+
+                const downloadBtnHtml = `
+                    <div class="article-actions">
+                        <button class="action-icon-btn" onclick="downloadArticle(${item.id})" aria-label="Download Article">
+                            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        </button>
+                    </div>
+                `;
+
+                if (item.layout === 'text-only') {
+                    return `
+                        <article class="article-text-only">
+                            <h2><a onclick="openArticleDetail(${item.id})">${item.title}</a></h2>
+                            ${item.about ? `<p>${item.about}</p>` : ''}
+                            <div class="meta-row">
+                                <div class="meta"><span>${item.date}</span> | <span class="cat-name">${item.category}</span></div>
+                                ${downloadBtnHtml}
+                            </div>
+                        </article>
+                    `;
+                } else if (item.layout === 'hero') {
+                    return `
+                        <article class="article-hero">
+                            ${thumbnailHtml}
+                            <h2><a onclick="openArticleDetail(${item.id})">${item.title}</a></h2>
+                            ${item.about ? `<p>${item.about}</p>` : ''}
+                            <div class="meta-row">
+                                <div class="meta"><span>${item.date}</span> | <span class="cat-name">${item.category}</span></div>
+                                ${downloadBtnHtml}
+                            </div>
+                        </article>
+                    `;
+                } else {
+                    return `
+                        <article class="article-list-item">
+                            <h3><a onclick="openArticleDetail(${item.id})">${item.title}</a></h3>
+                            ${item.about ? `<p>${item.about}</p>` : ''}
+                            ${thumbnailHtml}
+                            <div class="meta-row">
+                                <div class="meta"><span>${item.date}</span> | <span class="cat-name">${item.category}</span></div>
+                                ${downloadBtnHtml}
+                            </div>
+                        </article>
+                    `;
+                }
+            }).join('');
+        }
+
+        function openArticleDetail(id) {
+            const article = articles.find(a => a.id === id);
+            if (!article) return;
+
+            let imagesArray = article.images || (article.image ? [article.image] : []);
+            let galleryHtml = '';
+            if (imagesArray.length > 0) {
+                galleryHtml = `
+                    <div class="single-thumbnail-box" onclick="openLightbox(${article.id}, 0)" style="margin-bottom: 20px;">
+                        <img src="${imagesArray[0]}" alt="Detail Image">
+                        ${imagesArray.length > 1 ? `<div class="image-count-badge">📷 1/${imagesArray.length}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            let bioHtml = '';
+            if (article.founderBio && article.founderBio.trim() !== "") {
+                bioHtml = `
+                    <div class="bio-box">
+                        <h3>Details</h3>
+                        <p>${article.founderBio.replace(/\n/g, '<br>')}</p>
+                    </div>
+                `;
+            }
+
+            detailContentContainer.innerHTML = `
+                ${galleryHtml}
+                <h1>${article.title}</h1>
+                <div class="meta-row" style="margin-bottom:20px;">
+                    <div class="meta">
+                        <span>${article.date}</span> | <span class="cat-name">${article.category}</span>
+                    </div>
+                    <button class="action-icon-btn" onclick="downloadArticle(${article.id})">
+                        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    </button>
+                </div>
+                <div class="detail-full-text">
+                    ${article.fullBio ? article.fullBio.replace(/\n/g, '<br>') : (article.about || 'No full text available.')}
+                </div>
+                ${bioHtml}
+            `;
+
+            homeView.style.display = 'none';
+            detailView.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* LIGHTBOX WITH IMAGE CAPTIONS */
+        function openLightbox(articleId, imageIndex) {
+            const article = articles.find(a => a.id === articleId);
+            if (!article) return;
+
+            const imagesArray = article.images || (article.image ? [article.image] : []);
+            if (imagesArray.length === 0) return;
+
+            currentLightboxImages = imagesArray;
+            currentLightboxCaptions = article.imageCaptions || [];
+            currentLightboxIndex = imageIndex;
+            
+            const prevBtn = document.getElementById('lightboxPrevBtn');
+            const nextBtn = document.getElementById('lightboxNextBtn');
+            if (currentLightboxImages.length > 1) {
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+            } else {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+
+            updateLightboxImage();
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+
+        function updateLightboxImage() {
+            document.getElementById('lightboxImage').src = currentLightboxImages[currentLightboxIndex];
+            
+            const captionElem = document.getElementById('lightboxCaption');
+            const currentCaption = currentLightboxCaptions[currentLightboxIndex] || '';
+            
+            if (currentCaption.trim() !== '') {
+                captionElem.innerText = currentCaption;
+                captionElem.style.display = 'block';
+            } else {
+                captionElem.innerText = '';
+                captionElem.style.display = 'none';
+            }
+        }
+
+        function navigateLightbox(direction) {
+            if (currentLightboxImages.length <= 1) return;
+            currentLightboxIndex += direction;
+            if (currentLightboxIndex < 0) {
+                currentLightboxIndex = currentLightboxImages.length - 1;
+            } else if (currentLightboxIndex >= currentLightboxImages.length) {
+                currentLightboxIndex = 0;
+            }
+            updateLightboxImage();
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightboxModal').classList.remove('active');
+        }
+
+        /* EDIT ARTICLE & IMAGE DELETE PREVIEW */
+        function editArticle(id) {
+            const articleToEdit = articles.find(a => a.id === id);
+            if (!articleToEdit) return;
+
+            editingArticleId.value = articleToEdit.id;
+            document.getElementById('postTitle').value = articleToEdit.title;
+            document.getElementById('postAbout').value = articleToEdit.about || '';
+            document.getElementById('postFullBio').value = articleToEdit.fullBio || '';
+            document.getElementById('postFounderBio').value = articleToEdit.founderBio || '';
+            document.getElementById('postCategory').value = articleToEdit.category;
+            document.getElementById('postDate').value = articleToEdit.date || getAutoFormattedDate();
+            document.getElementById('postLayout').value = articleToEdit.layout || 'standard';
+            
+            if (articleToEdit.imageCaptions && articleToEdit.imageCaptions.length > 0) {
+                document.getElementById('postImageCaptions').value = articleToEdit.imageCaptions.join(', ');
+            } else {
+                document.getElementById('postImageCaptions').value = '';
+            }
+
+            // Load Existing Images for deletion
+            currentEditingImages = [...(articleToEdit.images || (articleToEdit.image ? [articleToEdit.image] : []))];
+            renderExistingImagePreviews();
+
+            document.getElementById('formHeading').innerText = "Edit Article";
+            document.getElementById('submitBtn').innerText = "Update Article";
+
+            adminModal.scrollTop = 0;
+        }
+
+        function renderExistingImagePreviews() {
+            const container = document.getElementById('existingImagesContainer');
+            const group = document.getElementById('existingImagesGroup');
+
+            if (currentEditingImages.length === 0) {
+                group.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            group.style.display = 'block';
+            container.innerHTML = currentEditingImages.map((img, idx) => `
+                <div class="image-preview-item">
+                    <img src="${img}" alt="Preview">
+                    <button type="button" class="delete-img-btn" onclick="removeImageFromEdit(${idx})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function removeImageFromEdit(index) {
+            currentEditingImages.splice(index, 1);
+            renderExistingImagePreviews();
+        }
+
+        function resetForm() {
+            editingArticleId.value = '';
+            articleForm.reset();
+            currentEditingImages = [];
+            document.getElementById('existingImagesGroup').style.display = 'none';
+            document.getElementById('postDate').value = getAutoFormattedDate();
+            document.getElementById('formHeading').innerText = "Add Article";
+            document.getElementById('submitBtn').innerText = "Save Article";
+        }
+
+        function deleteArticle(id) {
+            articles = articles.filter(a => a.id !== id);
+            localStorage.setItem('news_articles', JSON.stringify(articles));
+            renderCategories();
+            renderArticles();
+            renderManageList();
+            goHome();
+        }
+
+        function renderManageList() {
+            if (articles.length === 0) {
+                manageList.innerHTML = '<p style="font-size:13px; color:var(--sub-text);">No articles available.</p>';
+                return;
+            }
+            manageList.innerHTML = articles.map(item => `
+                <div class="manage-item">
+                    <span style="font-weight:bold; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.title}</span>
+                    <div class="manage-actions">
+                        <button class="btn-action" onclick="editArticle(${item.id})">Edit</button>
+                        <button class="btn-action" onclick="deleteArticle(${item.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        articleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const editId = editingArticleId.value;
+            const title = document.getElementById('postTitle').value;
+            const about = document.getElementById('postAbout').value;
+            const fullBio = document.getElementById('postFullBio').value;
+            const founderBio = document.getElementById('postFounderBio').value;
+            const category = document.getElementById('postCategory').value.trim();
+            let date = document.getElementById('postDate').value.trim();
+            if (!date) {
+                date = getAutoFormattedDate();
+            }
+
+            const layout = document.getElementById('postLayout').value;
+            const imageInput = document.getElementById('postImage');
+            
+            const captionsRaw = document.getElementById('postImageCaptions').value;
+            const imageCaptions = captionsRaw ? captionsRaw.split(',').map(c => c.trim()) : [];
+
+            const files = Array.from(imageInput.files);
+            let newlyUploadedImages = [];
+
+            if (files.length > 0) {
+                const readAsBase64 = (file) => new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+                newlyUploadedImages = await Promise.all(files.map(readAsBase64));
+            }
+
+            const finalImages = [...currentEditingImages, ...newlyUploadedImages];
+
+            if (editId) {
+                const index = articles.findIndex(a => a.id == editId);
+                if (index !== -1) {
+                    articles[index].title = title;
+                    articles[index].about = about;
+                    articles[index].fullBio = fullBio;
+                    articles[index].founderBio = founderBio;
+                    articles[index].category = category;
+                    articles[index].date = date;
+                    articles[index].layout = layout;
+                    articles[index].imageCaptions = imageCaptions;
+                    articles[index].images = finalImages;
+                }
+            } else {
+                const newArticle = {
+                    id: Date.now(),
+                    title,
+                    about,
+                    fullBio,
+                    founderBio,
+                    images: finalImages,
+                    imageCaptions,
+                    category,
+                    date,
+                    layout
+                };
+                articles.unshift(newArticle);
+            }
+
+            localStorage.setItem('news_articles', JSON.stringify(articles));
+
+            renderCategories();
+            renderArticles();
+            renderManageList();
+            closeAdminModal();
+            goHome();
+        });
+
+        // Initial Initialization
+        loadBreakingNews();
+        renderCategories();
+        renderArticles();
+    </script>
+</body>
+</html>
