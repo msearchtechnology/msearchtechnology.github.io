@@ -128,7 +128,7 @@
 
         async function fetchWikipedia(q) {
             try {
-                const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`;
+                const url = `${encodeURIComponent(q)}`;
                 let res = await fetch(url);
                 if (res.ok) {
                     let d = await res.json();
