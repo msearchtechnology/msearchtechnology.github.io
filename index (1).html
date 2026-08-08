@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>M Search</title>
+    <link rel="search" type="application/opensearchdescription+xml" title="M Search" href="opensearch.xml">
+    <style>
+        /* ORIGINAL DESIGN & COLORS FROM YOUR FILE */
+        * { box-sizing: border-box; }
+        body { margin:0; font-family: Arial, sans-serif; background:#0f0f0f; color:white; overflow-x:hidden; transition: 0.3s; }
+        
+        /* LIGHT MODE (Original Combination) */
+        body.light { background:#f4f7fb; color:black; }
+        body.light .search-pad { background:white; color:black; border:1px solid #ddd; }
+        body.light .big-box, body.light .res-card { background:white; color:black; border:1px solid #ddd; }
+        body.light #menuBox { background:white; color:black; border:1px solid #ddd; }
+        body.light #historyPage { background:#f4f7fb; color:black; }
+
+        /* SPLASH */
+        #splash { position:fixed; inset:0; background:#0f0f0f; display:flex; justify-content:center; align-items:center; z-index:1000; }
+        .logoCircle { width:120px; height:120px; border-radius:50%; background:#4285F4; display:flex; align-items:center; justify-content:center; font-size:60px; font-weight:bold; color:white; }
+
+        /* PAGE SYSTEM */
+        .page { display:none; padding: 22px; width: 100%; min-height: 100vh; }
+        .show { display: block; }
+
+        /* HEADER */
+        .header { text-align:center; margin-top: 15vh; margin-bottom: 35px; }
+        .header h1 { font-size: 50px; font-weight: bold; margin: 0; color: #4285F4; }
+
+        /* SEARCH BAR & BUTTONS (Original Blue Combination) */
+        .search-pad { width:100%; height:58px; border-radius:30px; border: none; padding:0 25px; font-size:20px; background:#1f1f1f; color:white; outline:none; }
+        .search-btn { width:100%; height:55px; margin-top:15px; border-radius:30px; border:none; font-size:18px; font-weight: bold; background:#4285F4; color:white; cursor:pointer; }
+
+        /* HOME PILL (Blue as per previous original file) */
+        .home-pill {
+            display: flex; align-items: center; gap: 12px;
+            background: #4285F4; color: white; width: fit-content; 
+            padding: 10px 25px; border-radius: 50px; 
+            margin-bottom: 25px; cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(66, 133, 244, 0.3);
+        }
+        .home-pill span { font-size: 22px; font-weight: bold; letter-spacing: 0.5px; }
+
+        /* BOXES & CARDS */
+        .big-box, .res-card { background:#1f1f1f; border-radius:20px; padding:20px; margin-top:15px; }
+        .res-row { margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .res-label { color: #8ab4f8; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .res-value { font-size: 17px; margin-top: 2px; }
+
+        /* MENU & HISTORY */
+        #menuBtn { position:fixed; top:15px; right:15px; font-size:28px; z-index: 101; cursor:pointer; }
+        #menuBox { position:fixed; top:55px; right:15px; background:#1f1f1f; border-radius:10px; padding:10px; display:none; z-index: 102; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .menu-item { padding:12px 20px; cursor:pointer; border-bottom: 1px solid #333; }
+        #historyPage { position:fixed; inset:0; background:#0f0f0f; padding:20px; display:none; z-index:999; overflow-y:auto; }
+        .history-item { padding:15px; font-size:16px; border-bottom:1px solid #333; color: #8ab4f8; }
+
+        #answer img { width: 100%; border-radius: 15px; margin-top: 15px; border: 1px solid #444; }
+    </style>
+</head>
+<body>
+
+    <div id="splash"><div class="logoCircle">M</div></div>
+    <div id="menuBtn" onclick="toggleMenu()">⋮</div>
+
+    <div id="menuBox">
+        <div class="menu-item" onclick="openHistory()">History</div>
+        <div class="menu-item" onclick="toggleMode()">Mode</div>
+    </div>
+
+    <div id="historyPage">
+        <div onclick="closeHistory()" style="text-align:right; font-size:30px; margin-bottom:20px;">✕</div>
+        <h2>Search History</h2>
+        <div id="fullHistoryContainer"></div>
+        <button onclick="clearHistory()" style="width:100%; padding:15px; background:red; color:white; border:none; border-radius:10px; margin-top:20px;">Clear History</button>
+    </div>
+
+    <div id="page1" class="page show">
+        <div class="header"><h1>M Search</h1></div>
+        <input class="search-pad" placeholder="Search on M search..." readonly onclick="goPage(2)">
+        <div class="big-box"><h2>M search</h2><p>Simple search engine.</p></div>
+        <div class="big-box"><h2>Info</h2><p>Open source information</p></div>
+    </div>
+    </div>
+    
+
+    <div id="page2" class="page">
+    <div class="home-pill" onclick="goPage(1)"><span>Home</span></div>
+    
+    <form action="" method="GET" onsubmit="event.preventDefault(); search();">
+        <input id="query" type="text" name="q" class="search-pad" placeholder="Search..." oninput="showSuggestions()" autofocus>
+        <button type="submit" class="search-btn">Search</button>
+    </form>
+    
+    <div id="historySuggestions" style="margin-top:10px;"></div>
+</div>
+
+    <div id="page3" class="page">
+        <h2 style="margin-top:40px;">Result</h2>
+        <div id="answer"></div>
+        <button class="search-btn" onclick="goPage(2)" style="background:#333;">BACK</button>
+    </div>
+
+    <script>
+        // FULL SMART DATA FROM YOUR NOTES
+        const smartData = {
+            "entities": {
+                "m search": { "properties": { "about": "M Search is a mini search engine.", "founder": "M.H", "owner": "MGPLC", "created": "2023" } },
+                "mgplc": { "properties": { "full_name": "M GROUP PRIVATE LIMITED COMPANY", "about": "Parent company of M Search and 18 others.", "founder": "M.H", "created": "2017", "total_company": "18", "network": "1.2 Trillion MSDR" } },
+                "m.h": { "properties": { "name": "Mehdi Hasan", "about": "Creator of M Search and founder of MGPLC.", "role": "Founder and Creator" } },
+                "mapp": { "properties": { "about": "MAPP is the holding app of all apps.", "owner": "MGPLC", "total_apps": "48", "created": "5/12/2024" } },
+                "redx": { "properties": { "about": "REDX is an entertainment app.", "owner": "REDX COMPANY", "category": "Entertainment", "created": "5/12/2024" } },
+                "tc": { "properties": {"about": "Tc is a car company and technology company.", "owner":"MGPLC", "created":"2020" } }
+            }
+        };
+
+        let historyList = [];
+
+        function loadHistory(){
+            let h = localStorage.getItem("m_history");
+            if(h) historyList = JSON.parse(h);
+        }
+
+        function saveHistory(){
+            localStorage.setItem("m_history", JSON.stringify(historyList));
+        }
+
+        async function fetchWikipedia(q) {
+            try {
+                const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`;
+                let res = await fetch(url);
+                if (res.ok) {
+                    let d = await res.json();
+                    return { text: d.extract, img: d.originalimage ? d.originalimage.source : null };
+                }
+            } catch (e) { return null; }
+        }
+
+        function getSmartAnswer(q) {
+            let query = q.toLowerCase().trim();
+            if (smartData.entities[query]) {
+                let p = smartData.entities[query].properties;
+                let h = `<div class="res-card">`;
+                for(let key in p) {
+                    h += `<div class="res-row"><div class="res-label">${key.toUpperCase()}</div><div class="res-value">${p[key]}</div></div>`;
+                }
+                h += `</div>`;
+                return h;
+            }
+            return null;
+        }
+
+        async function search() {
+            let q = document.getElementById("query").value.trim();
+            if(!q) return;
+
+            if(!historyList.includes(q)){
+                historyList.unshift(q);
+                saveHistory();
+            }
+
+            document.getElementById("answer").innerHTML = "Searching...";
+            goPage(3);
+
+            let local = getSmartAnswer(q);
+            let wiki = await fetchWikipedia(q);
+
+            let finalHTML = "";
+            if(local) finalHTML += local;
+            if(wiki && wiki.text) {
+                finalHTML += `<div class="res-card">${wiki.text}</div>`;
+                if(wiki.img) finalHTML += `<img src="${wiki.img}">`;
+            }
+
+            if(!local && (!wiki || !wiki.text)) finalHTML = "<div class='res-card'>No results found.</div>";
+            document.getElementById("answer").innerHTML = finalHTML;
+        }
+
+        function goPage(n) {
+            document.querySelectorAll(".page").forEach(p => p.classList.remove("show"));
+            document.getElementById("page"+n).classList.add("show");
+            document.getElementById("menuBox").style.display="none";
+        }
+
+        function toggleMenu(){
+            let m=document.getElementById("menuBox");
+            m.style.display=m.style.display==="block"?"none":"block";
+        }
+
+        function toggleMode(){ document.body.classList.toggle("light"); toggleMenu(); }
+
+        function openHistory(){ 
+            document.getElementById("historyPage").style.display="block"; 
+            renderFullHistory(); 
+            toggleMenu();
+        }
+
+        function closeHistory(){ document.getElementById("historyPage").style.display="none"; }
+
+        function renderFullHistory(){
+            let box = document.getElementById("fullHistoryContainer");
+            box.innerHTML = historyList.map(item => `<div class="history-item" onclick="document.getElementById('query').value='${item}'; search(); closeHistory();">${item}</div>`).join("");
+        }
+
+        function clearHistory(){ historyList=[]; saveHistory(); renderFullHistory(); }
+
+        function showSuggestions() {
+            let q = document.getElementById("query").value.toLowerCase();
+            let h = document.getElementById("historySuggestions");
+            h.innerHTML = "";
+            if(!q) return;
+            for(let key in smartData.entities) {
+                if(key.includes(q)) {
+                    let d = document.createElement("div");
+                    d.className="history-item"; d.innerText=key;
+                    d.onclick=()=>{ document.getElementById("query").value=key; search(); };
+                    h.appendChild(d);
+                }
+            }
+        }
+
+        loadHistory();
+        setTimeout(() => document.getElementById("splash").style.display="none", 2000);
+    </script>
+</body>
+    </html>
