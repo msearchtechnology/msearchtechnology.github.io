@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M Search - Personal Knowledge Engine</title>
+    <style>
+        :root {
+            --blue: #8ab4f8;
+            --bg: #0f0f0f;
+            --text: #e8eaed;
+            --card: #1f1f1f;
+            --green: #34a853;
+            --border: #3c4043;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            transition: 0.3s;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 5%;
+        }
+
+        .search-container-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .search-box { flex: 1; }
+        .menu-trigger {
+            cursor: pointer;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4285F4;
+            text-decoration: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .logo span { color: white; }
+
+        .search-input {
+            width: 100%;
+            height: 44px;
+            border-radius: 22px;
+            border: 1px solid #5f6368;
+            background: #202124;
+            color: white;
+            padding: 0 20px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .search-input:focus { border-color: var(--blue); background: #303134; }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            padding: 10px 5% 0 150px;
+            font-size: 14px;
+            color: #9aa0a6;
+            border-bottom: 1px solid #333;
+        }
+        .tab {
+            padding-bottom: 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: 0.3s;
+        }
+        .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+        main {
+            padding: 20px 5% 40px 150px;
+            max-width: 1000px;
+            min-height: 80vh;
+        }
+
+        /* Search Result Cards & 3-Line Restriction */
+        .g-result-card {
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .g-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            width: fit-content;
+        }
+        .g-header:hover .g-site-name { text-decoration: underline; }
+
+        .g-favicon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #303134;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #5f6368;
+            flex-shrink: 0;
+        }
+        .g-favicon svg {
+            width: 16px;
+            height: 16px;
+            fill: #8ab4f8;
+        }
+        .g-site-info { display: flex; flex-direction: column; }
+        .g-site-name { font-size: 14px; color: #e8eaed; font-weight: 500; line-height: 1.2; }
+        .g-site-url { font-size: 12px; color: #9aa0a6; line-height: 1.2; }
+
+        .g-topic-title {
+            font-size: 20px;
+            color: var(--blue);
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 0 6px 0;
+            font-weight: 400;
+            cursor: pointer;
+            line-height: 1.3;
+        }
+        .g-topic-title:hover { text-decoration: underline; }
+
+        /* STRICT 3-LINE DISPLAY LIMIT */
+        .g-snippet {
+            font-size: 14px;
+            color: #bdc1c6;
+            line-height: 1.5;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.5em; /* 3 lines x 1.5 line-height */
+            cursor: pointer;
+        }
+
+        /* Image Grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .img-card {
+            background: var(--card);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .img-card:hover { transform: translateY(-5px); border-color: var(--blue); }
+        .img-card img { width: 100%; height: 150px; object-fit: cover; display: block; }
+        .img-card p {
+            padding: 8px;
+            font-size: 12px;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #e8eaed;
+        }
+
+        /* Video Items */
+        .video-item {
+            display: flex;
+            gap: 15px;
+            background: var(--card);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
+        .video-item:hover { border-color: var(--blue); }
+        .video-thumb {
+            width: 160px;
+            height: 90px;
+            background: #333;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #9aa0a6;
+        }
+        .video-thumb svg {
+            width: 32px;
+            height: 32px;
+            fill: #8ab4f8;
+        }
+
+        /* AI Chat */
+        #aiChatView {
+            display: none;
+            flex-direction: column;
+            height: 70vh;
+        }
+        #chatMessages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .msg {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 15px;
+            animation: fadeIn 0.3s;
+        }
+        .user-msg {
+            align-self: flex-end;
+            background: #4285f4;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-msg {
+            align-self: flex-start;
+            background: #303134;
+            color: #e8eaed;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #444;
+        }
+        .chat-input-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            background: #303134;
+            padding: 10px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        #chatInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            outline: none;
+        }
+        .send-btn {
+            background: #4285f4;
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* Side Menu */
+        body.light-mode {
+            --bg: #ffffff;
+            --text: #202124;
+            --card: #f1f3f4;
+        }
+        #sideMenu {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100%;
+            background: var(--card);
+            border-left: 1px solid #333;
+            z-index: 1001;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+        }
+        #sideMenu.active { right: 0; }
+        .menu-header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        .menu-item:hover { background: rgba(66, 133, 244, 0.1); color: var(--blue); }
+        .pane {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        #noteArea {
+            width: 100%;
+            height: 350px;
+            background: rgba(0,0,0,0.2);
+            color: var(--text);
+            border: 1px solid #444;
+            padding: 12px;
+            border-radius: 8px;
+            resize: none;
+            outline: none;
+        }
+        .history-entry {
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Fullscreen Topic Custom View */
+        #topicCustomViewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #121212;
+            color: #e8eaed;
+            z-index: 3000;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .tv-header {
+            height: 60px;
+            background: #1f1f1f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .tv-site-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--blue);
+        }
+        .tv-search-icon {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #2a2a2a;
+        }
+        .tv-search-icon:hover { background: #3a3a3a; }
+        .tv-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .tv-images-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scroll-snap-type: x mandatory;
+        }
+        .tv-images-container img {
+            max-height: 280px;
+            border-radius: 10px;
+            object-fit: cover;
+            scroll-snap-align: start;
+            border: 1px solid #333;
+        }
+        .tv-about-box {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #d1d5db;
+            background: #18191c;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #2a2a2a;
+            white-space: pre-wrap;
+        }
+
+        /* Site Search Popup Modal */
+        #siteSearchPopup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 4000;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 80px;
+        }
+        .popup-box {
+            background: #1f1f1f;
+            border: 1px solid #444;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+        }
+        .popup-search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: 1px solid #555;
+            background: #121212;
+            color: white;
+            outline: none;
+        }
+        .popup-results-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .popup-topic-box {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--blue);
+            transition: 0.2s;
+        }
+        .popup-topic-box:hover {
+            background: var(--blue);
+            color: #000;
+        }
+
+        /* Admin Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #202124;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #444;
+        }
+        .modal-content h2 { margin-top: 0; color: var(--blue); }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #bdc1c6;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: #141414;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 6px;
+            outline: none;
+        }
+        .file-upload-box {
+            background: #141414;
+            border: 2px dashed #5f6368;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+        }
+        .file-upload-box input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary { background: #4285f4; color: white; }
+        .btn-success { background: #34a853; color: white; }
+        .btn-warning { background: #fbbc05; color: #000; }
+        .btn-danger { background: #ea4335; color: white; font-size: 11px; padding: 5px 10px; }
+
+        .site-card {
+            background: #18191c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+        .site-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        .topic-item {
+            background: #222327;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+        .img-preview-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .img-preview-container .thumb-wrap {
+            position: relative;
+            display: inline-block;
+        }
+        .img-preview-container img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #555;
+        }
+        .img-preview-container .remove-img-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* SEARCHING ANIMATION */
+        .search-loader-text {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .loading-dots:after { 
+            content: ' .'; 
+            animation: dots 1s steps(5, end) infinite; 
+        }
+        @keyframes dots { 
+            0%, 20% { color: rgba(0,0,0,0); text-shadow: .5em 0 0 rgba(0,0,0,0), 1em 0 0 rgba(0,0,0,0); } 
+            40% { color: #8ab4f8; text-shadow: .5em 0 0 rgba(0,0,0,0), 1em 0 0 rgba(0,0,0,0); } 
+            60% { text-shadow: .5em 0 0 #8ab4f8, 1em 0 0 rgba(0,0,0,0); } 
+            80%, 100% { text-shadow: .5em 0 0 #8ab4f8, 1em 0 0 #8ab4f8; } 
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 800px) {
+            header { padding: 10px; }
+            .tabs { padding: 10px; justify-content: center; }
+            main { padding: 20px; }
+            .chat-input-container { width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" onclick="goHome()">M <span>Search</span></div>
+        <div class="search-container-row">
+            <div class="search-box">
+                <form onsubmit="event.preventDefault(); handleGlobalSearch();">
+                    <input id="qInput" type="text" class="search-input" placeholder="Search in your data engine...">
+                </form>
+            </div>
+            <div class="menu-trigger" onclick="openMenu()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Side Menu -->
+    <div id="sideMenu">
+        <div class="menu-header">
+            <span style="font-weight:bold; color:var(--blue);">MENU</span>
+            <span onclick="closeMenu()" style="cursor:pointer; font-size:26px;">&times;</span>
+        </div>
+        <div id="mainLinks">
+            <div class="menu-item" onclick="toggleTheme()">Switch Theme Mode</div>
+            <div class="menu-item" onclick="showPane('devPane')">Developer</div>
+            <div class="menu-item" onclick="showPane('legalPane')">Privacy & Legal Policy</div>
+            <div class="menu-item" onclick="showPane('historyPane')">Search History</div>
+            <div class="menu-item" onclick="showPane('notePane')">Notes</div>
+            <div class="menu-item" onclick="openAdmin()">Data Manager</div>
+        </div>
+
+        <div id="historyPane" class="pane">
+            <div id="historyList"></div>
+            <button onclick="clearHistory()" style="margin-top:15px; width:100%; padding:10px; background:#ea4335; color:white; border:none; border-radius:5px; cursor:pointer;">Clear History</button>
+            <p onclick="backToMain()" style="text-align:center; color:var(--blue); cursor:pointer; margin-top:20px;">Back</p>
+        </div>
+        <div id="devPane" class="pane" style="text-align:center;">
+            <h3 style="color:var(--blue);">Developer Information</h3>
+            <p>Developed & Maintained by:</p>
+            <h2 style="margin:5px 0;">M.H (Mehdi Hasan)</h2>
+            <p style="font-size:14px; opacity:0.8;">Founder & CEO of M Search</p>
+            <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+            <p style="font-size:12px;">M Search Project started in 2023.</p>
+            <p onclick="backToMain()" style="color:var(--blue); cursor:pointer; margin-top:20px;">Back</p>
+        </div>
+        <div id="legalPane" class="pane">
+            <h3 style="color:var(--blue); border-bottom:1px solid #333; padding-bottom:10px;">Legal & Privacy</h3>
+            <div style="font-size:12px; line-height:1.6; color:#bdc1c6;">
+                <h4 style="color:white; margin-bottom:5px;">1. Personal Data Engine</h4>
+                <p>M Search works purely on your custom local database. It does not track, sell or leak your private search data.</p>
+            </div>
+            <p onclick="backToMain()" style="text-align:center; color:var(--blue); cursor:pointer; margin-top:20px; font-weight:bold;">Back to Menu</p>
+        </div>
+        <div id="notePane" class="pane">
+            <textarea id="noteArea" placeholder="Write your task or notes..." oninput="saveNote()"></textarea>
+            <p onclick="backToMain()" style="text-align:center; color:var(--blue); cursor:pointer; margin-top:20px;">Back</p>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div id="tab-web" class="tab active" onclick="setTab('web')">All</div>
+        <div id="tab-ai" class="tab" onclick="setTab('ai')">AI Assistant</div>
+        <div id="tab-img" class="tab" onclick="setTab('images')">Images</div>
+        <div id="tab-vid" class="tab" onclick="setTab('videos')">Videos</div>
+    </div>
+
+    <main id="resultsArea">
+        <div id="homeView" style="text-align:center; margin-top:100px;">
+            <h1 style="color:#4285F4; font-size:50px;">M Search</h1>
+            <p>Your Private Standalone Data Search Engine</p>
+        </div>
+
+        <div id="aiChatView">
+            <div id="chatMessages">
+                <div class="msg bot-msg">Hello! Ask me anything from your personal added topics!</div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" placeholder="Message M AI..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button class="send-btn" onclick="sendChatMessage()">Ask</button>
+            </div>
+        </div>
+
+        <div id="searchContent"></div>
+    </main>
+
+    <!-- HTML File Dedicated Fullscreen Viewer Modal -->
+    <div id="htmlFileViewer" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#fff; z-index:3500; flex-direction:column;">
+        <div style="height:50px; background:#1f1f1f; display:flex; align-items:center; justify-content:space-between; padding:0 20px; color:white; border-bottom:1px solid #333;">
+            <button onclick="closeHtmlViewer()" style="background:#4285f4; color:white; border:none; padding:6px 14px; border-radius:20px; cursor:pointer; font-weight:bold;">&larr; Back to Search</button>
+            <span id="htmlViewerTitle" style="font-weight:bold; color:var(--blue); font-size:15px;"></span>
+            <div></div>
+        </div>
+        <iframe id="htmlViewerFrame" style="width:100%; height:calc(100vh - 50px); border:none; background:#fff;"></iframe>
+    </div>
+
+    <!-- Fullscreen Topic View Page -->
+    <div id="topicCustomViewer">
+        <div class="tv-header">
+            <button onclick="closeTopicViewer()" style="background:#4285f4; color:white; border:none; padding:6px 14px; border-radius:20px; cursor:pointer; font-weight:bold;">&larr; Back to Search</button>
+            <div class="tv-site-name" id="tvSiteNameDisplay">Website Name</div>
+            <div class="tv-search-icon" onclick="openSiteSearchPopup()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </div>
+        </div>
+        <div class="tv-content">
+            <h2 id="tvTopicTitleDisplay" style="color:var(--blue); margin-top:10px;">Topic Title</h2>
+            <div id="tvImagesContainer" class="tv-images-container"></div>
+            <div id="tvAboutDisplay" class="tv-about-box">Topic content will appear here...</div>
+        </div>
+    </div>
+
+    <!-- Site Internal Search Popup Modal -->
+    <div id="siteSearchPopup">
+        <div class="popup-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span style="font-size:14px; color:#bdc1c6;">Search Topics in Site</span>
+                <span onclick="closeSiteSearchPopup()" style="cursor:pointer; font-size:20px;">&times;</span>
+            </div>
+            <input type="text" id="popupSearchInput" class="popup-search-input" placeholder="Type letters to search topics..." oninput="filterSiteTopicsPopup()">
+            <div id="popupResultsGrid" class="popup-results-grid"></div>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <h2>M Search Data Management</h2>
+            <p style="font-size: 12px; color: #bdc1c6;">Add and manage website domains and multiple articles/data inside them.</p>
+            <hr style="border:0; border-top:1px solid #333; margin-bottom:15px;">
+
+            <div id="websiteManagerView">
+                <div style="background:#18191c; padding:15px; border-radius:8px; border:1px solid #333; margin-bottom:20px;">
+                    <h4 style="margin:0 0 10px 0; color:var(--blue);">Add New Website</h4>
+                    <div class="form-group">
+                        <label>Website Name</label>
+                        <input type="text" id="addSiteName" placeholder="e.g. Information Tech">
+                    </div>
+                    <div class="form-group">
+                        <label>Domain URL</label>
+                        <input type="text" id="addSiteDomain" placeholder="e.g. infotech.ai">
+                    </div>
+                    <div class="form-group">
+                        <label>About Website</label>
+                        <textarea id="addSiteAbout" rows="2" placeholder="About this website..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Website Logo</label>
+                        <input type="hidden" id="addSiteLogoBase64">
+                        <input type="file" id="addSiteLogoPicker" accept="image/*" onchange="processLogoFile(this, 'addSiteLogoBase64', 'addSiteLogoPreview')">
+                        <img id="addSiteLogoPreview" style="display:none; width: 40px; height: 40px; border-radius: 50%; margin-top:5px; object-fit: cover;">
+                    </div>
+                    <div class="form-group">
+                        <label>HTML / Web Code File (Optional)</label>
+                        <div class="file-upload-box">
+                            <input type="file" id="addSiteCodePicker" accept=".html,.htm,.txt,.pdf" onchange="processCodeFile(this, 'addSiteCode', 'addSiteFileType', 'addUploadStatus')">
+                            <div id="addUploadStatus" style="color:#9aa0a6;">Upload HTML or Code File</div>
+                        </div>
+                        <input type="hidden" id="addSiteCode">
+                        <input type="hidden" id="addSiteFileType">
+                    </div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="saveNewWebsite()">Save Website</button>
+                </div>
+
+                <h3 style="margin-top:10px; color:var(--blue);">Saved Websites</h3>
+                <div id="siteList"></div>
+            </div>
+
+            <div id="siteEditorView" style="display:none;">
+                <button class="btn btn-warning" onclick="backToWebsiteList()">Back to Websites</button>
+                <hr style="border:0; border-top:1px dashed #444; margin:15px 0;">
+
+                <div style="background:#18191c; padding:15px; border-radius:8px; border:1px solid #333; margin-bottom:20px;">
+                    <h4 style="margin:0 0 10px 0; color:var(--blue);">Edit Website Info</h4>
+                    <div class="form-group"><label>Website Name</label><input type="text" id="editSiteName"></div>
+                    <div class="form-group"><label>Domain URL</label><input type="text" id="editSiteDomain"></div>
+                    <div class="form-group"><label>About Website</label><textarea id="editSiteAbout" rows="2"></textarea></div>
+                    <div class="form-group">
+                        <label>Website Logo</label>
+                        <input type="hidden" id="editSiteLogoBase64">
+                        <input type="file" id="editSiteLogoPicker" accept="image/*" onchange="processLogoFile(this, 'editSiteLogoBase64', 'editSiteLogoPreview')">
+                        <img id="editSiteLogoPreview" style="display:none; width: 40px; height: 40px; border-radius: 50%; margin-top:5px; object-fit: cover;">
+                    </div>
+                    <button class="btn btn-primary" onclick="updateWebsiteInfo()">Update Website Info</button>
+                </div>
+
+                <div style="background:#18191c; padding:15px; border-radius:8px; border:1px solid #333; margin-bottom:20px;">
+                    <h4 style="margin:0 0 10px 0; color:#34a853;" id="topicFormTitle">Add New Topic</h4>
+                    <div class="form-group"><label>Topic Name</label><input type="text" id="topicTitle"></div>
+                    <div class="form-group"><label>About / Description</label><textarea id="topicDesc" rows="3"></textarea></div>
+                    <div class="form-group">
+                        <label>Topic Images (Multiple allowed)</label>
+                        <input type="file" id="topicImagesPicker" accept="image/*" multiple onchange="processTopicImages(this)">
+                        <div id="topicImagesPreview" class="img-preview-container"></div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-success" style="flex:1;" onclick="saveTopicData()">Save Topic</button>
+                        <button class="btn btn-warning" onclick="clearTopicForm()">Cancel Edit</button>
+                    </div>
+                </div>
+
+                <h3 style="margin-top:10px; color:var(--blue);">Saved Topics</h3>
+                <div id="topicList"></div>
+            </div>
+
+            <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
+            <button class="btn btn-success" style="width:100%; margin-bottom:15px;" onclick="downloadStandaloneApp()">Download Permanent App</button>
+            <button class="btn btn-danger" style="width:100%;" onclick="closeAdmin()">Close Panel</button>
+        </div>
+    </div>
+
+    <script>
+        const GLOBE_SVG = `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`;
+        const PLAY_SVG = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+
+        // Permanent Data Container Initializer
+        window.embeddedData = window.embeddedData || []; 
+        let db = null;
+        let localDB = [];
+        let activeSiteIdx = -1;
+        let activeTopicIdx = -1;
+        let tempTopicImages = [];
+        let currentActiveSiteObj = null;
+
+        function initIndexedDB() {
+            return new Promise((resolve) => {
+                try {
+                    const request = indexedDB.open("MSearchDB", 1);
+                    request.onupgradeneeded = function(e) {
+                        let dbInstance = e.target.result;
+                        if (!dbInstance.objectStoreNames.contains("websites")) {
+                            dbInstance.createObjectStore("websites", { keyPath: "id" });
+                        }
+                    };
+                    request.onsuccess = function(e) {
+                        db = e.target.result;
+                        fetchDatabaseData().then(() => resolve());
+                    };
+                    request.onerror = function() {
+                        if(Array.isArray(window.embeddedData) && window.embeddedData.length > 0) localDB = window.embeddedData;
+                        resolve(); 
+                    };
+                } catch(err) {
+                    if(Array.isArray(window.embeddedData) && window.embeddedData.length > 0) localDB = window.embeddedData;
+                    resolve();
+                }
+            });
+        }
+
+        function fetchDatabaseData() {
+            return new Promise((resolve) => {
+                if (!db) {
+                    if(Array.isArray(window.embeddedData) && window.embeddedData.length > 0) {
+                        localDB = window.embeddedData;
+                        renderSiteList();
+                    }
+                    return resolve();
+                }
+                try {
+                    const tx = db.transaction("websites", "readonly");
+                    const store = tx.objectStore("websites");
+                    const request = store.getAll();
+                    request.onsuccess = function() {
+                        let res = request.result || [];
+                        if (res.length === 0 && Array.isArray(window.embeddedData) && window.embeddedData.length > 0) {
+                            localDB = window.embeddedData;
+                            localDB.forEach(site => saveSiteToDB(site));
+                        } else {
+                            localDB = res;
+                        }
+                        renderSiteList();
+                        resolve();
+                    };
+                    request.onerror = function() {
+                        if(Array.isArray(window.embeddedData) && window.embeddedData.length > 0) localDB = window.embeddedData;
+                        resolve();
+                    };
+                } catch(e) {
+                    if(Array.isArray(window.embeddedData) && window.embeddedData.length > 0) localDB = window.embeddedData;
+                    resolve();
+                }
+            });
+        }
+
+        function saveSiteToDB(siteObj) {
+            return new Promise((resolve) => {
+                if (!siteObj.id) siteObj.id = "site_" + Date.now();
+                
+                // Always sync to localDB state
+                let idx = localDB.findIndex(s => s.id === siteObj.id);
+                if(idx !== -1) localDB[idx] = siteObj;
+                else localDB.push(siteObj);
+                
+                if (!db) {
+                    renderSiteList();
+                    return resolve();
+                }
+                try {
+                    const tx = db.transaction("websites", "readwrite");
+                    const store = tx.objectStore("websites");
+                    store.put(siteObj);
+                    tx.oncomplete = function() {
+                        fetchDatabaseData().then(() => resolve());
+                    };
+                } catch(e) {
+                    renderSiteList();
+                    resolve();
+                }
+            });
+        }
+
+        function deleteSiteFromDB(id) {
+            return new Promise((resolve) => {
+                localDB = localDB.filter(s => s.id !== id);
+                if (!db) {
+                    renderSiteList();
+                    return resolve();
+                }
+                try {
+                    const tx = db.transaction("websites", "readwrite");
+                    const store = tx.objectStore("websites");
+                    store.delete(id);
+                    tx.oncomplete = function() {
+                        fetchDatabaseData().then(() => resolve());
+                    };
+                } catch(e) {
+                    renderSiteList();
+                    resolve();
+                }
+            });
+        }
+
+        function tokenizeQuery(query) {
+            const tokens = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < query.length; i++) {
+                let char = query[i];
+                if (char === '"') {
+                    if (inQuotes) {
+                        if (current.trim()) tokens.push({ type: 'phrase', val: current.trim().toLowerCase() });
+                        current = '';
+                        inQuotes = false;
+                    } else {
+                        if (current.trim()) {
+                            current.trim().toLowerCase().split(/\s+/).forEach(t => tokens.push({ type: 'word', val: t }));
+                        }
+                        current = '';
+                        inQuotes = true;
+                    }
+                } else if (char === ' ' && !inQuotes) {
+                    if (current.trim()) {
+                        tokens.push({ type: 'word', val: current.trim().toLowerCase() });
+                        current = '';
+                    }
+                } else {
+                    current += char;
+                }
+            }
+            if (current.trim()) {
+                if (inQuotes) {
+                    tokens.push({ type: 'phrase', val: current.trim().toLowerCase() });
+                } else {
+                    current.trim().toLowerCase().split(/\s+/).forEach(t => tokens.push({ type: 'word', val: t }));
+                }
+            }
+            return tokens;
+        }
+
+        function matchScore(text, queryTokens) {
+            if (!text || queryTokens.length === 0) return 0;
+            const lowerText = text.toLowerCase();
+            let score = 0;
+            
+            for (let token of queryTokens) {
+                if (token.type === 'phrase') {
+                    if (lowerText.includes(token.val)) {
+                        score += 100 + (token.val.length * 2);
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    let regex = new RegExp('\\b' + token.val + '\\b', 'i');
+                    if (regex.test(lowerText)) {
+                        score += 10;
+                    } else if (lowerText.includes(token.val)) {
+                        score += 5;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+            return score;
+        }
+
+        function getAllSearchableSites() {
+            return localDB;
+        }
+
+        function handleGlobalSearch() {
+            const rawQ = document.getElementById("qInput").value.trim();
+            if (!rawQ) return;
+            saveToHistory(rawQ);
+
+            const allSites = getAllSearchableSites();
+            const cleanQueryDomain = rawQ.toLowerCase().replace(/^https?:\/\//, '').replace(/^mmm\./, '');
+            let directSiteIdx = allSites.findIndex(s => s.domain && s.domain.toLowerCase().replace(/^https?:\/\//, '').replace(/^mmm\./, '') === cleanQueryDomain);
+
+            if (directSiteIdx !== -1) {
+                const foundSite = allSites[directSiteIdx];
+                if (foundSite.fileCode && foundSite.fileType === 'html') {
+                    openHtmlViewer(foundSite);
+                    return;
+                } else if (foundSite.topics && foundSite.topics.length > 0) {
+                    openDirectSiteByObj(foundSite, 0);
+                    return;
+                }
+            }
+
+            setTab('web');
+            startSearch('web');
+        }
+
+        function setTab(type) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const tabId = 'tab-' + (type === 'web' ? 'web' : type === 'images' ? 'img' : type === 'videos' ? 'vid' : 'ai');
+            if (document.getElementById(tabId)) document.getElementById(tabId).classList.add('active');
+
+            document.getElementById("homeView").style.display = "none";
+            const aiView = document.getElementById("aiChatView");
+            const searchContent = document.getElementById("searchContent");
+
+            if (type === 'ai') {
+                aiView.style.display = "flex";
+                searchContent.style.display = "none";
+            } else {
+                aiView.style.display = "none";
+                searchContent.style.display = "block";
+                const query = document.getElementById("qInput").value.trim();
+                if (query) startSearch(type);
+            }
+        }
+
+        function startSearch(type) {
+            const rawQuery = document.getElementById("qInput").value.trim();
+            if (!rawQuery) return;
+
+            document.title = rawQuery + " - M Search";
+            document.getElementById("homeView").style.display = "none";
+            const area = document.getElementById("searchContent");
+
+            area.innerHTML = `<div style="text-align:center; margin-top:50px;"><span class="search-loader-text loading-dots">Searching</span></div>`;
+
+            setTimeout(() => {
+                executeSearchLogic(type, rawQuery, area);
+            }, 300);
+        }
+
+        function executeSearchLogic(type, rawQuery, area) {
+            const queryTokens = tokenizeQuery(rawQuery);
+            const allSites = getAllSearchableSites();
+
+            if (type === 'web') {
+                let matches = [];
+                allSites.forEach((site) => {
+                    if (site.topics) {
+                        site.topics.forEach((top, tIdx) => {
+                            let siteText = (site.name || "") + " " + (site.domain || "") + " " + (site.about || "");
+                            let topicText = (top.title || "") + " " + (top.desc || "");
+                            let combinedText = siteText + " " + topicText;
+
+                            let score = matchScore(combinedText, queryTokens);
+                            if (score > 0) {
+                                matches.push({ site, topic: top, tIdx, score });
+                            }
+                        });
+                    }
+                });
+
+                matches.sort((a, b) => b.score - a.score);
+
+                if (matches.length === 0) {
+                    area.innerHTML = "<p style='color:#9aa0a6; padding-top:10px;'>No results found in your knowledge base for: <b>" + rawQuery + "</b></p>";
+                    return;
+                }
+
+                let html = "";
+                matches.forEach(item => {
+                    const site = item.site;
+                    const top = item.topic;
+                    const logoHtml = site.logo ?
+                        `<img src="${site.logo}" class="g-favicon">` :
+                        `<div class="g-favicon">${GLOBE_SVG}</div>`;
+                    let snippet = top.desc || "No description available.";
+                    
+                    let cleanDomain = site.domain ? site.domain.replace(/^https?:\/\//, '').replace(/^mmm\./, '') : '';
+                    let fullUrlDisplay = cleanDomain ? `https://mmm.${cleanDomain}` : '';
+
+                    html += `
+                        <div class="g-result-card">
+                            <div class="g-header" onclick="openSiteOrTopicById('${site.id}', ${item.tIdx})">
+                                ${logoHtml}
+                                <div class="g-site-info">
+                                    <span class="g-site-name">${site.name}</span>
+                                    ${fullUrlDisplay ? `<span class="g-site-url">${fullUrlDisplay}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="g-topic-title" onclick="openSiteOrTopicById('${site.id}', ${item.tIdx})">${top.title}</div>
+                            <!-- 3 LINES MAXIMUM DISP -->
+                            <p class="g-snippet" onclick="openSiteOrTopicById('${site.id}', ${item.tIdx})">${snippet}</p>
+                        </div>
+                    `;
+                });
+                area.innerHTML = html;
+            } else if (type === 'images') {
+                let html = `<div class="image-grid">`;
+                let count = 0;
+                allSites.forEach((site) => {
+                    if (site.topics) {
+                        site.topics.forEach((top, tIdx) => {
+                            let topicText = (top.title || "") + " " + (top.desc || "") + " " + (site.name || "") + " " + (site.domain || "");
+                            let score = matchScore(topicText, queryTokens);
+                            if (score > 0 && top.images && top.images.length > 0) {
+                                top.images.forEach(imgSrc => {
+                                    html += `
+                                        <div class="img-card" onclick="openSiteOrTopicById('${site.id}', ${tIdx})">
+                                            <img src="${imgSrc}" loading="lazy">
+                                            <p>${top.title}</p>
+                                        </div>`;
+                                    count++;
+                                });
+                            }
+                        });
+                    }
+                });
+                html += `</div>`;
+                area.innerHTML = count > 0 ? html : "<p style='color:#9aa0a6;'>No matching topic images found.</p>";
+            } else if (type === 'videos') {
+                let videoHtml = "";
+                let found = false;
+                allSites.forEach((site) => {
+                    if (site.topics) {
+                        site.topics.forEach((top, tIdx) => {
+                            let topicText = (top.title || "") + " " + (top.desc || "") + " " + (site.name || "");
+                            let score = matchScore(topicText, queryTokens);
+                            if (score > 0) {
+                                videoHtml += `
+                                    <div class="video-item" onclick="openSiteOrTopicById('${site.id}', ${tIdx})" style="cursor:pointer;">
+                                        <div class="video-thumb">${PLAY_SVG}</div>
+                                        <div>
+                                            <div class="res-title" style="font-size:16px; color:var(--blue);">${top.title}</div>
+                                            <p class="res-snippet" style="color:#bdc1c6; font-size:14px; margin:5px 0 0 0;">${top.desc ? top.desc.substring(0, 120) : 'No description'}</p>
+                                        </div>
+                                    </div>`;
+                                found = true;
+                            }
+                        });
+                    }
+                });
+                area.innerHTML = found ? videoHtml : "<p style='color:#9aa0a6;'>No video content found.</p>";
+            }
+        }
+
+        function openSiteOrTopicById(siteId, tIdx) {
+            const allSites = getAllSearchableSites();
+            const site = allSites.find(s => s.id === siteId);
+            if (site) {
+                openSiteOrTopic(site, tIdx);
+            }
+        }
+
+        function openSiteOrTopic(site, tIdx) {
+            if (site && site.fileCode && site.fileType === 'html') {
+                openHtmlViewer(site);
+            } else {
+                openDirectSiteByObj(site, tIdx);
+            }
+        }
+
+        function openHtmlViewer(site) {
+            let cleanDomain = site.domain ? site.domain.replace(/^https?:\/\//, '').replace(/^mmm\./, '') : '';
+            let fullUrlDisplay = cleanDomain ? `https://mmm.${cleanDomain}` : '';
+
+            document.getElementById("htmlViewerTitle").innerText = `${site.name} (${fullUrlDisplay})`;
+            const frame = document.getElementById("htmlViewerFrame");
+            frame.srcdoc = site.fileCode;
+            document.getElementById("htmlFileViewer").style.display = "flex";
+        }
+
+        function closeHtmlViewer() {
+            document.getElementById("htmlViewerFrame").srcdoc = "";
+            document.getElementById("htmlFileViewer").style.display = "none";
+        }
+
+        function openDirectSiteByObj(site, tIdx) {
+            if (!site || !site.topics || !site.topics[tIdx]) return;
+
+            currentActiveSiteObj = site;
+            const topic = site.topics[tIdx];
+
+            document.getElementById("tvSiteNameDisplay").innerText = site.name;
+            document.getElementById("tvTopicTitleDisplay").innerText = topic.title;
+            document.getElementById("tvAboutDisplay").innerText = topic.desc || "No description provided.";
+
+            const imgContainer = document.getElementById("tvImagesContainer");
+            imgContainer.innerHTML = "";
+            if (topic.images && topic.images.length > 0) {
+                topic.images.forEach(imgSrc => {
+                    imgContainer.innerHTML += `<img src="${imgSrc}" alt="Topic Image">`;
+                });
+                imgContainer.style.display = "flex";
+            } else {
+                imgContainer.style.display = "none";
+            }
+
+            document.getElementById("topicCustomViewer").style.display = "flex";
+        }
+
+        function closeTopicViewer() {
+            document.getElementById("topicCustomViewer").style.display = "none";
+        }
+
+        function openSiteSearchPopup() {
+            document.getElementById("siteSearchPopup").style.display = "flex";
+            document.getElementById("popupSearchInput").value = "";
+            filterSiteTopicsPopup();
+        }
+
+        function closeSiteSearchPopup() {
+            document.getElementById("siteSearchPopup").style.display = "none";
+        }
+
+        function filterSiteTopicsPopup() {
+            const query = document.getElementById("popupSearchInput").value.trim().toLowerCase();
+            const grid = document.getElementById("popupResultsGrid");
+            grid.innerHTML = "";
+
+            if (!currentActiveSiteObj || !currentActiveSiteObj.topics) return;
+
+            currentActiveSiteObj.topics.forEach((top, idx) => {
+                if (!query || top.title.toLowerCase().includes(query) || (top.desc && top.desc.toLowerCase().includes(query))) {
+                    const box = document.createElement("div");
+                    box.className = "popup-topic-box";
+                    box.innerText = top.title;
+                    box.onclick = () => {
+                        openSiteOrTopic(currentActiveSiteObj, idx);
+                        closeSiteSearchPopup();
+                    };
+                    grid.appendChild(box);
+                }
+            });
+
+            if (grid.children.length === 0) {
+                grid.innerHTML = "<span style='color:#777; font-size:12px;'>No matching topics found.</span>";
+            }
+        }
+
+        function goHome() {
+            closeTopicViewer();
+            closeHtmlViewer();
+            closeAdmin();
+            document.getElementById("qInput").value = "";
+            document.getElementById("homeView").style.display = "block";
+            document.getElementById("searchContent").style.display = "none";
+            document.getElementById("aiChatView").style.display = "none";
+            document.title = "M Search - Personal Knowledge Engine";
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById("chatInput");
+            const rawMsg = input.value.trim();
+            if (!rawMsg) return;
+
+            const box = document.getElementById("chatMessages");
+            box.innerHTML += `<div class="msg user-msg">${rawMsg}</div>`;
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+
+            const msgTokens = tokenizeQuery(rawMsg);
+            const allSites = getAllSearchableSites();
+            let bestMatches = [];
+
+            for (let site of allSites) {
+                if (site.topics) {
+                    for (let top of site.topics) {
+                        let text = (top.title || "") + " " + (top.desc || "") + " " + (site.name || "");
+                        let score = matchScore(text, msgTokens);
+                        if (score > 0) {
+                            bestMatches.push({ site, topic: top, score });
+                        }
+                    }
+                }
+            }
+
+            bestMatches.sort((a, b) => b.score - a.score);
+
+            let reply = "Sorry, this information was not found in your local added topics.";
+            if (bestMatches.length > 0) {
+                let m = bestMatches[0];
+                reply = `According to <b>${m.topic.title}</b> (${m.site.name}):<br><br>${m.topic.desc}`;
+            }
+
+            setTimeout(() => {
+                box.innerHTML += `<div class="msg bot-msg">${reply}</div>`;
+                box.scrollTop = box.scrollHeight;
+            }, 300);
+        }
+
+        function openAdmin() {
+            document.getElementById("adminModal").style.display = "flex";
+            backToWebsiteList();
+        }
+
+        function closeAdmin() {
+            document.getElementById("adminModal").style.display = "none";
+        }
+
+        function processLogoFile(input, base64Id, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(base64Id).value = e.target.result;
+                    const preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function processCodeFile(input, codeId, typeId, statusId) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                const statusText = document.getElementById(statusId);
+
+                if (file.type === "application/pdf" || file.name.endsWith('.pdf')) {
+                    reader.onload = function(e) {
+                        document.getElementById(codeId).value = e.target.result;
+                        document.getElementById(typeId).value = "pdf";
+                        if (statusText) statusText.innerHTML = `<span style="color:#34a853; font-weight:bold;">PDF Attached</span>`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.onload = function(e) {
+                        document.getElementById(codeId).value = e.target.result;
+                        document.getElementById(typeId).value = "html";
+                        if (statusText) statusText.innerHTML = `<span style="color:#34a853; font-weight:bold;">Web Code File Attached</span>`;
+                    };
+                    reader.readAsText(file);
+                }
+            }
+        }
+
+        async function saveNewWebsite() {
+            const name = document.getElementById("addSiteName").value.trim();
+            let domain = document.getElementById("addSiteDomain").value.trim();
+            const about = document.getElementById("addSiteAbout").value.trim();
+            const logo = document.getElementById("addSiteLogoBase64").value.trim();
+            const fileCode = document.getElementById("addSiteCode").value.trim();
+            const fileType = document.getElementById("addSiteFileType").value.trim();
+
+            if (!name || !domain) {
+                alert("Please fill in the Website Name and Domain URL!");
+                return;
+            }
+
+            domain = domain.replace(/^https?:\/\//, '').replace(/^mmm\./, '');
+
+            const newSiteObj = {
+                id: "site_" + Date.now(),
+                name: name,
+                domain: domain,
+                about: about,
+                logo: logo,
+                fileCode: fileCode,
+                fileType: fileType,
+                topics: []
+            };
+
+            await saveSiteToDB(newSiteObj);
+
+            document.getElementById("addSiteName").value = "";
+            document.getElementById("addSiteDomain").value = "";
+            document.getElementById("addSiteAbout").value = "";
+            document.getElementById("addSiteLogoBase64").value = "";
+            document.getElementById("addSiteLogoPreview").style.display = "none";
+            document.getElementById("addSiteCode").value = "";
+            document.getElementById("addSiteFileType").value = "";
+            document.getElementById("addUploadStatus").innerText = "Upload HTML or Code File";
+
+            alert("Website saved successfully!");
+            if (document.getElementById("qInput").value.trim()) {
+                startSearch('web');
+            }
+        }
+
+        function renderSiteList() {
+            const container = document.getElementById("siteList");
+            container.innerHTML = "";
+
+            if (localDB.length === 0) {
+                container.innerHTML = "<p style='color:#777; font-size:13px;'>No custom websites saved yet.</p>";
+                return;
+            }
+
+            localDB.forEach((site, sIdx) => {
+                container.innerHTML += `
+                    <div class="site-card">
+                        <div class="site-card-header" style="border:none; margin:0; padding:0;">
+                            <div>
+                                <strong style="color:var(--blue); font-size:15px;">${site.name}</strong>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" style="font-size:11px; padding:4px 8px;" onclick="editWebsite(${sIdx})">Edit</button>
+                                <button class="btn btn-danger" style="font-size:11px; padding:4px 8px;" onclick="deleteWebsite('${site.id}')">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function deleteWebsite(siteId) {
+            if (confirm("Are you sure you want to delete this website and all its topics?")) {
+                await deleteSiteFromDB(siteId);
+                if (document.getElementById("qInput").value.trim()) {
+                    startSearch('web');
+                }
+            }
+        }
+
+        function editWebsite(sIdx) {
+            activeSiteIdx = sIdx;
+            const site = localDB[sIdx];
+
+            document.getElementById("websiteManagerView").style.display = "none";
+            document.getElementById("siteEditorView").style.display = "block";
+
+            document.getElementById("editSiteName").value = site.name || "";
+            document.getElementById("editSiteDomain").value = site.domain || "";
+            document.getElementById("editSiteAbout").value = site.about || "";
+            document.getElementById("editSiteLogoBase64").value = site.logo || "";
+
+            const logoPreview = document.getElementById("editSiteLogoPreview");
+            if (site.logo) {
+                logoPreview.src = site.logo;
+                logoPreview.style.display = "block";
+            } else {
+                logoPreview.style.display = "none";
+            }
+
+            clearTopicForm();
+            renderTopicList();
+        }
+
+        function backToWebsiteList() {
+            activeSiteIdx = -1;
+            document.getElementById("siteEditorView").style.display = "none";
+            document.getElementById("websiteManagerView").style.display = "block";
+            renderSiteList();
+        }
+
+        async function updateWebsiteInfo() {
+            if (activeSiteIdx < 0) return;
+            const site = localDB[activeSiteIdx];
+
+            const name = document.getElementById("editSiteName").value.trim();
+            const domain = document.getElementById("editSiteDomain").value.trim().replace(/^https?:\/\//, '').replace(/^mmm\./, '');
+            const about = document.getElementById("editSiteAbout").value.trim();
+            const logo = document.getElementById("editSiteLogoBase64").value.trim();
+
+            if (!name || !domain) {
+                alert("Website Name and Domain cannot be empty!");
+                return;
+            }
+
+            site.name = name;
+            site.domain = domain;
+            site.about = about;
+            site.logo = logo;
+
+            await saveSiteToDB(site);
+            alert("Website updated successfully!");
+            if (document.getElementById("qInput").value.trim()) {
+                startSearch('web');
+            }
+        }
+
+        function processTopicImages(input) {
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        tempTopicImages.push(e.target.result);
+                        renderTopicImagesPreview();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function renderTopicImagesPreview() {
+            const container = document.getElementById("topicImagesPreview");
+            container.innerHTML = "";
+            tempTopicImages.forEach((imgSrc, idx) => {
+                container.innerHTML += `
+                    <div class="thumb-wrap">
+                        <img src="${imgSrc}">
+                        <button class="remove-img-btn" onclick="removeTopicImage(${idx})">&times;</button>
+                    </div>
+                `;
+            });
+        }
+
+        function removeTopicImage(idx) {
+            tempTopicImages.splice(idx, 1);
+            renderTopicImagesPreview();
+        }
+
+        function clearTopicForm() {
+            activeTopicIdx = -1;
+            document.getElementById("topicTitle").value = "";
+            document.getElementById("topicDesc").value = "";
+            document.getElementById("topicImagesPicker").value = "";
+            document.getElementById("topicFormTitle").innerText = "Add New Topic";
+            tempTopicImages = [];
+            renderTopicImagesPreview();
+        }
+
+        async function saveTopicData() {
+            if (activeSiteIdx < 0) return;
+
+            const tTitle = document.getElementById("topicTitle").value.trim();
+            const tDesc = document.getElementById("topicDesc").value.trim();
+
+            if (!tTitle) {
+                alert("Please fill in the Topic Name!");
+                return;
+            }
+
+            const topicDataObj = {
+                title: tTitle,
+                desc: tDesc,
+                images: [...tempTopicImages]
+            };
+
+            const siteTarget = localDB[activeSiteIdx];
+            if (!siteTarget.topics) siteTarget.topics = [];
+
+            if (activeTopicIdx >= 0 && siteTarget.topics[activeTopicIdx]) {
+                siteTarget.topics[activeTopicIdx] = topicDataObj;
+            } else {
+                siteTarget.topics.push(topicDataObj);
+            }
+
+            await saveSiteToDB(siteTarget);
+            clearTopicForm();
+            renderTopicList();
+            alert("Topic saved successfully!");
+            if (document.getElementById("qInput").value.trim()) {
+                startSearch('web');
+            }
+        }
+
+        function renderTopicList() {
+            const container = document.getElementById("topicList");
+            container.innerHTML = "";
+            if (activeSiteIdx < 0) return;
+
+            const site = localDB[activeSiteIdx];
+            if (!site.topics || site.topics.length === 0) {
+                container.innerHTML = "<p style='color:#777; font-size:13px;'>No topics saved for this website.</p>";
+                return;
+            }
+
+            site.topics.forEach((top, tIdx) => {
+                container.innerHTML += `
+                    <div class="topic-item">
+                        <div>
+                            <strong style="color:#e8eaed;">${top.title}</strong>
+                            <br><small style="color:#9aa0a6;">${top.images ? top.images.length : 0} images included</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" style="font-size:10px; padding:3px 7px;" onclick="editTopic(${tIdx})">Edit</button>
+                            <button class="btn btn-danger" style="font-size:10px; padding:3px 7px;" onclick="deleteTopic(${tIdx})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function editTopic(tIdx) {
+            if (activeSiteIdx < 0) return;
+            activeTopicIdx = tIdx;
+
+            const topic = localDB[activeSiteIdx].topics[tIdx];
+
+            document.getElementById("topicFormTitle").innerText = "Edit Topic";
+            document.getElementById("topicTitle").value = topic.title || "";
+            document.getElementById("topicDesc").value = topic.desc || "";
+
+            tempTopicImages = topic.images ? [...topic.images] : [];
+            renderTopicImagesPreview();
+        }
+
+        async function deleteTopic(tIdx) {
+            if (activeSiteIdx < 0) return;
+            if (confirm("Are you sure you want to delete this topic?")) {
+                localDB[activeSiteIdx].topics.splice(tIdx, 1);
+                await saveSiteToDB(localDB[activeSiteIdx]);
+                renderTopicList();
+                if (document.getElementById("qInput").value.trim()) {
+                    startSearch('web');
+                }
+            }
+        }
+
+        /* PERMANENT DOWNLOAD FIX FUNCTION */
+        function downloadStandaloneApp() {
+            try {
+                let docClone = document.documentElement.cloneNode(true);
+                
+                // Hide Modals/Viewers in snapshot
+                let customViewer = docClone.querySelector("#topicCustomViewer");
+                if (customViewer) customViewer.style.display = "none";
+                let adminM = docClone.querySelector("#adminModal");
+                if (adminM) adminM.style.display = "none";
+
+                // Strip out old embedded script if present
+                let oldInject = docClone.querySelector("#embeddedDataScript");
+                if (oldInject) oldInject.remove();
+
+                let htmlContent = docClone.outerHTML;
+
+                // Escape special characters safely
+                const safeJSON = JSON.stringify(localDB).replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+
+                // Embed Data Injected Directly Before Header End
+                const injectionScript = `<script id="embeddedDataScript">
+                    window.embeddedData = ${safeJSON};
+                <\/script>`;
+
+                htmlContent = htmlContent.replace('</head>', injectionScript + '\n</head>');
+
+                const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+                const downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = "MSearch_Permanent_Engine.html";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(downloadLink.href);
+
+                alert("परमानेंट ऐप डाउनलोड हो गई है! अब इस फाइल को किसी भी डिवाइस में खोलेंगे तो डेटा उसमें पहले से मौजूद रहेगा।");
+            } catch(err) {
+                alert("Download Error: " + err.message);
+            }
+        }
+
+        function openMenu() { document.getElementById("sideMenu").classList.add("active"); }
+        function closeMenu() { document.getElementById("sideMenu").classList.remove("active"); backToMain(); }
+        function toggleTheme() { document.body.classList.toggle("light-mode"); }
+
+        function showPane(id) {
+            document.getElementById("mainLinks").style.display = "none";
+            document.querySelectorAll(".pane").forEach(p => p.style.display = "none");
+            document.getElementById(id).style.display = "flex";
+            if (id === 'historyPane') updateHistoryList();
+        }
+
+        function backToMain() {
+            document.getElementById("mainLinks").style.display = "block";
+            document.querySelectorAll(".pane").forEach(p => p.style.display = "none");
+        }
+
+        function saveToHistory(q) {
+            let h = JSON.parse(localStorage.getItem("mHist") || "[]");
+            h = h.filter(x => x !== q);
+            h.unshift(q);
+            localStorage.setItem("mHist", JSON.stringify(h.slice(0, 15)));
+        }
+
+        function updateHistoryList() {
+            const list = document.getElementById("historyList");
+            const h = JSON.parse(localStorage.getItem("mHist") || "[]");
+            list.innerHTML = h.length ? "" : "<p style='opacity:0.5; text-align:center;'>History is empty</p>";
+            h.forEach(q => {
+                const d = document.createElement("div");
+                d.className = "history-entry";
+                d.innerText = q;
+                d.onclick = () => {
+                    document.getElementById("qInput").value = q;
+                    handleGlobalSearch();
+                    closeMenu();
+                };
+                list.appendChild(d);
+            });
+        }
+
+        function clearHistory() { localStorage.removeItem("mHist"); updateHistoryList(); }
+        function saveNote() { localStorage.setItem("mNote", document.getElementById("noteArea").value); }
+
+        window.onload = async () => {
+            await initIndexedDB();
+            goHome();
+
+            const savedNote = localStorage.getItem("mNote");
+            if (savedNote) document.getElementById("noteArea").value = savedNote;
+
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('q')) {
+                document.getElementById("qInput").value = params.get('q');
+                handleGlobalSearch();
+            }
+        };
+    </script>
+</body>
+</html>
