@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="iFriend — a quiet space to share with friends.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <title>iFriend</title>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <section id="welcome" class="screen welcome-screen">
+      <div class="brand-mark">i<span>F</span></div>
+      <p class="eyebrow">YOUR PEOPLE. YOUR SPACE.</p>
+      <h1>Meet your<br><span>own little world.</span></h1>
+      <p class="muted intro">Share thoughts, photos, stories and long-form writing with your friends.</p>
+      <button id="getStarted" class="primary-btn">Get Started <span>→</span></button>
+      <p class="tiny">A community app prototype · iFriend</p>
+    </section>
+
+    <section id="auth" class="screen auth-screen hidden">
+      <button id="backWelcome" class="back-btn" aria-label="Back">←</button>
+      <div class="brand-mark small">i<span>F</span></div>
+      <h2 id="authTitle">Welcome back.</h2>
+      <p id="authSubtitle" class="muted">Log in to your iFriend space.</p>
+      <form id="authForm">
+        <label id="nameWrap" class="field hidden">Full name<input id="fullName" autocomplete="name" placeholder="Your name"></label>
+        <label class="field">Username<input id="username" required minlength="3" maxlength="24" autocomplete="username" placeholder="e.g. moromi_01"></label>
+        <label class="field">Password<input id="password" required minlength="6" type="password" autocomplete="current-password" placeholder="At least 6 characters"></label>
+        <button id="authSubmit" class="primary-btn" type="submit">Log In <span>→</span></button>
+      </form>
+      <p id="authError" class="error" role="status"></p>
+      <p class="switch-auth"><span id="switchText">New to iFriend?</span> <button id="switchMode" class="text-btn">Create new</button></p>
+      <p class="tiny security-note">Demo authentication only. Read README before using real/private data.</p>
+    </section>
+
+    <section id="mainApp" class="main-app hidden">
+      <header class="topbar">
+        <div class="brand-inline"><span class="mini-mark">iF</span><span>iFriend</span></div>
+        <div class="top-actions"><button id="installBtn" class="icon-btn hidden" title="Install app">↓</button><button id="logoutBtn" class="avatar" title="Log out">U</button></div>
+      </header>
+      <div class="layout">
+        <aside class="sidebar">
+          <button class="nav-item active" data-page="feed"><span>⌂</span> Home</button>
+          <button class="nav-item" data-page="messages"><span>✉</span> Messages</button>
+          <button class="nav-item" data-page="discover"><span>⌕</span> Discover</button>
+          <button class="nav-item" data-page="profile"><span>◉</span> My profile</button>
+          <div class="sidebar-bottom"><div class="online-dot"></div><span>Local-first demo</span></div>
+        </aside>
+        <main class="content">
+          <section id="feedPage" class="page">
+            <div class="page-heading"><div><p class="eyebrow">YOUR CORNER OF THE INTERNET</p><h2>Home feed</h2></div><button id="newPostShortcut" class="round-add">＋</button></div>
+            <form id="postForm" class="composer">
+              <div class="composer-head"><div class="avatar user-avatar" id="composerAvatar">U</div><div><strong id="composerName">You</strong><p class="muted small-text">What’s on your mind?</p></div></div>
+              <input id="postTitle" class="title-input hidden" maxlength="120" placeholder="Article title (optional)">
+              <textarea id="postText" maxlength="12000" rows="3" placeholder="Write a thought, a story, or something worth sharing..." required></textarea>
+              <div id="imagePreview" class="image-preview hidden"></div>
+              <div class="composer-tools"><div class="tool-group">
+                <label class="tool-btn" for="imageInput">▧ <span>Photo</span></label><input id="imageInput" class="hidden" type="file" accept="image/*">
+                <button type="button" id="articleToggle" class="tool-btn">▤ <span>Article</span></button>
+              </div><button type="submit" class="post-btn">Share post ↗</button></div>
+            </form>
+            <div class="feed-toolbar"><span>Latest posts</span><span id="postCount" class="muted small-text">0 posts</span></div>
+            <div id="feedList" class="feed-list"><div class="empty-state"><div class="empty-icon">✳</div><h3>Your feed starts here</h3><p>Share a thought or add a friend’s post to get the conversation going.</p></div></div>
+          </section>
+
+          <section id="messagesPage" class="page hidden">
+            <div class="page-heading"><div><p class="eyebrow">ONE-TO-ONE</p><h2>Messages</h2></div></div>
+            <div class="panel">
+              <p class="muted">Start a chat by entering a friend’s exact username. Both people need to use the same GunDB network/peer configuration for cross-device sync.</p>
+              <form id="chatStartForm" class="inline-form"><input id="chatUsername" required placeholder="Friend username"><button class="secondary-btn" type="submit">Open chat</button></form>
+              <div id="chatArea" class="chat-area"><div class="empty-state compact"><div class="empty-icon">✉</div><h3>No chat selected</h3><p>Choose a friend to start a conversation.</p></div></div>
+            </div>
+          </section>
+
+          <section id="discoverPage" class="page hidden">
+            <div class="page-heading"><div><p class="eyebrow">FIND YOUR PEOPLE</p><h2>Discover</h2></div></div>
+            <div class="panel"><h3>Find a friend</h3><form id="discoverForm" class="inline-form"><input id="discoverUsername" placeholder="Search exact username" required><button class="secondary-btn">Search</button></form><div id="discoverResult"></div></div>
+            <div class="panel"><h3>Community note</h3><p class="muted">This starter does not crawl or expose a public user directory. Search only finds accounts that are available on your configured Gun graph.</p></div>
+          </section>
+
+          <section id="profilePage" class="page hidden">
+            <div class="page-heading"><div><p class="eyebrow">YOUR PROFILE</p><h2>My profile</h2></div></div>
+            <div class="profile-card"><div class="profile-avatar" id="profileAvatar">U</div><h2 id="profileName">Your name</h2><p id="profileHandle" class="muted">@username</p><p class="muted">Sharing a little more of your world, one post at a time.</p></div>
+            <div class="panel"><h3>Connection settings</h3><label class="field">Gun peer URL<input id="peerUrl" placeholder="https://your-own-gun-peer.example/gun"></label><p class="muted small-text">Leave blank for this browser’s local demo mode. For multi-device sync, configure a Gun peer you control and use the same URL on each device.</p><button id="savePeer" class="secondary-btn">Save connection</button><p id="peerStatus" class="muted small-text"></p></div>
+            <div class="panel warning-panel"><h3>Privacy & security</h3><p class="muted">GunDB is a synchronization database, not a guarantee of end-to-end privacy. A peer/relay may receive replicated data. This prototype uses demo auth and does not yet encrypt posts or messages end-to-end. Do not use it for sensitive information.</p></div>
+          </section>
+        </main>
+        <aside class="right-rail">
+          <div class="panel welcome-card"><p class="eyebrow">A SMALL REMINDER</p><h3>Good things grow<br>when shared.</h3><div class="line-art">iF<span>✳</span></div></div>
+          <div class="panel"><h3>Quick guide</h3><p class="muted small-text">Write a short post, attach a photo, or switch to Article for a title and long-form text.</p><div class="guide-row">▧ <span>Photo posts</span></div><div class="guide-row">▤ <span>Articles</span></div><div class="guide-row">✉ <span>Private chat UI</span></div></div>
+          <p class="tiny rail-note">iFriend · Black / white / grey</p>
+        </aside>
+      </div>
+      <nav class="mobile-nav"><button data-page="feed" class="active">⌂<span>Home</span></button><button data-page="messages">✉<span>Chat</span></button><button data-page="discover">⌕<span>Discover</span></button><button data-page="profile">◉<span>Profile</span></button></nav>
+    </section>
+    <div id="toast" class="toast" role="status"></div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
